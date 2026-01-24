@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Pré-Vendas TurboSul</title>
+    
+    <!-- Inclusão do Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Importação da fonte 'Inter' do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos customizados e animações -->
+    <style>
+        /* Define a fonte 'Inter' como padrão para toda a página */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Animação de entrada para o card, replicando o login */
+        @keyframes fadeInScaleUp {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-entry {
+            animation: fadeInScaleUp 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen px-4">
+
+    <!-- Card Principal com o Conteúdo do Dashboard de Pré-Vendas -->
+    <main class="w-full max-w-md bg-white rounded-xl shadow-lg p-10 text-center animate-entry">
+        <!-- Logo e Título -->
+        <div class="flex flex-col items-center mb-6">
+            <img src="https://i.postimg.cc/Jh5Jvrc9/IMG-7901.png" alt="Logo TurboSul" class="w-24 h-24 mb-4">
+            <h1 class="text-2xl font-bold text-gray-800">Dashboard Pré-Vendas</h1>
+        </div>
+
+        <!-- Mensagem de Sucesso -->
+        <div class="mb-8">
+            <p class="text-lg text-green-600 font-semibold mb-2">🎉 Autenticação bem-sucedida!</p>
+            <p class="text-gray-600">Sua área de trabalho está pronta para o controle de produção.</p>
+        </div>
+
+        <!-- Botão de Sair (Logout) -->
+        <button 
+            id="logout-button"
+            class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-red-600 focus:ring-opacity-50 transition-all duration-300 ease-in-out"
+        >
+            Sair
+        </button>
+    </main>
+
+    <!-- Inclusão da biblioteca do Supabase via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Lógica de Verificação de Sessão e Logout com JavaScript Puro -->
+    <script>
+        // 1. Inicialização do Cliente Supabase
+        const SUPABASE_URL = 'https://zghaqlaqozsskfldgsfe.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnaGFxbGFxb3pzc2tmbGRnc2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyMDY1MzQsImV4cCI6MjA4NDc4MjUzNH0.aC2DMOUNhS2uK6KGI5Sf2c2vGhrCKHMnRyZhL3WwSus';
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 2. Verificação de Sessão (Proteção de Rota)
+        async function checkSessionAndProtectRoute() {
+            // Tenta obter a sessão do usuário
+            const { data: { session }, error } = await supabase.auth.getSession();
+
+            // Se não houver sessão ou houver erro, redireciona para o login
+            if (error || !session) {
+                // Redireciona para o login (assumindo que o index.html é a página de login)
+                window.location.href = '/index.html'; 
+            }
+            // Se houver sessão, o usuário permanece na página.
+        }
+
+        // Executa a verificação assim que a página carregar
+        checkSessionAndProtectRoute();
+
+
+        // 3. Lógica do Botão de Sair (Logout)
+        const logoutButton = document.getElementById('logout-button');
+
+        logoutButton.addEventListener('click', async () => {
+            // Chama a função de desautenticação do Supabase
+            const { error } = await supabase.auth.signOut();
+
+            if (error) {
+                console.error("Erro ao fazer logout:", error);
+                alert("Erro ao sair da sessão. Tente novamente.");
+            } else {
+                // Redireciona o usuário de volta para a página de login
+                window.location.href = '/index.html';
+            }
+        });
+    </script>
+</body>
+</html>
