@@ -34,14 +34,14 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 pt-20"> <!-- Acomoda o header maior -->
+<body class="bg-slate-100 pt-20"> 
 
-    <!-- HEADER FIXO (Topo da Tela) - AJUSTADO -->
+    <!-- HEADER FIXO (Topo da Tela) -->
     <header class="fixed top-0 left-0 right-0 h-20 bg-white shadow-md z-10 flex items-center justify-between px-8">
         <div class="flex items-center space-x-4">
-            <img src="https://i.postimg.cc/Jh5Jvrc9/IMG-7901.png" alt="Logo TurboSul" class="w-10 h-10"> <!-- Logo aumentada -->
+            <img src="https://i.postimg.cc/Jh5Jvrc9/IMG-7901.png" alt="Logo TurboSul" class="w-10 h-10">
             <div>
-                <h1 class="text-lg font-bold text-gray-800">TurboSul - Controle de Produção</h1> <!-- Título aumentado -->
+                <h1 class="text-lg font-bold text-gray-800">TurboSul - Controle de Produção</h1>
                 <p class="text-sm text-gray-500">Gerenciamento de Ordens de Serviço</p>
             </div>
         </div>
@@ -62,9 +62,8 @@
         </nav>
     </header>
 
-    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- CONTEÚDO PRINCIPAL (Mantido) -->
     <main class="p-6 lg:p-10">
-        <!-- Título da Página e Botão de Ação -->
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-semibold text-gray-800">Pré-Vendas / Entrada</h2>
             <button id="novo-orcamento-btn" class="bg-brand-blue hover:bg-brand-blue-dark text-white font-medium py-2 px-4 rounded-md shadow transition duration-200">
@@ -76,9 +75,7 @@
             <span class="text-brand-blue border-b-2 border-brand-blue font-medium pb-1">Entrada / Programação</span>
         </div>
 
-        <!-- Layout de Duas Colunas -->
         <div class="lg:flex lg:space-x-8 space-y-6 lg:space-y-0">
-            <!-- Coluna 1: Fila do Dia (60%) -->
             <div class="lg:w-3/5">
                 <div class="bg-green-100 p-4 rounded-lg shadow-sm border border-green-200 mb-4 flex justify-between items-center">
                     <h3 class="text-lg font-semibold text-green-700">Fila do Dia (Despachar para Análise)</h3>
@@ -87,13 +84,11 @@
                     </button>
                 </div>
                 
-                <!-- Container Dinâmico para os Cards da Fila -->
                 <div id="fila-do-dia-container" class="space-y-4">
                     <p id="loading-message" class="text-gray-500 text-center mt-8">Carregando ordens...</p>
                 </div>
             </div>
 
-            <!-- Coluna 2: Programação Futura (40%) -->
             <div class="lg:w-2/5">
                 <div class="bg-blue-100 p-4 rounded-lg shadow-sm border border-blue-200 mb-4">
                     <h3 class="text-lg font-semibold text-blue-700">Programação Futura (Aguardando Data)</h3>
@@ -118,7 +113,6 @@
             </div>
 
             <form id="new-os-form" class="p-6 space-y-6">
-                <!-- Linhas compactadas para reduzir o número de linhas -->
                 <div><label for="orcamento_entrada_num" class="block text-sm font-medium text-gray-700 mb-1">Número do Orçamento / Entrada</label><input type="text" id="orcamento_entrada_num" name="orcamento_entrada_num" placeholder="Ex: ORC-100" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="nome_cliente" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label><input type="text" id="nome_cliente" name="nome_cliente" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="modelo_turbo" class="block text-sm font-medium text-gray-700 mb-1">Modelo do Turbo</label><input type="text" id="modelo_turbo" name="modelo_turbo" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
@@ -366,7 +360,7 @@
                         difficulty: order.difficulty || 1,
                         is_trade_in: order.is_trade_in || false,
                         hull_state: order.hull_state || 'UNKNOWN',
-                        exchange_status: order.exchange_status || null, // Valor enviado pelo modal de criação
+                        exchange_status: order.exchange_status || null, 
                         observation: order.observation || null,
                         created_at: order.created_at,
                         maintenance_extras: (typeof order.maintenance_extras === 'string' && order.maintenance_extras.startsWith('{')) 
@@ -375,6 +369,10 @@
                     };
                 });
                 
+                // >>>>> ADIÇÃO CRÍTICA PARA DEBUGGING: Verifique o console <<<<<
+                console.log("Array de ordens (currentOrders):", currentOrders);
+
+
                 loadingMessage.classList.add('hidden');
                 
                 if (currentOrders.length === 0) {
@@ -401,45 +399,39 @@
         
         function showDetailsModal(order) {
             
-            // --- CORREÇÃO DO TIPO DE VENDA E STATUS DE TROCA ---
+            // --- TRATAMENTO DO TIPO DE VENDA (Garantido para não ser UNKNOWN) ---
             let tradeInText = 'Venda Comum';
             if (order.is_trade_in) {
-                // Prioriza o exchange_status (o valor que o usuário selecionou)
-                let status = order.exchange_status || order.hull_state;
-
-                // Mapeia o status UNKNOWN/Aguardando para exibição amigável
-                if (status === 'UNKNOWN' || status === 'Não Selecionado' || status === null) {
+                let status = order.exchange_status; // Tenta pegar o valor do modal de criação
+                
+                // Se o status do modal de criação falhou, tenta o status do banco (hull_state)
+                if (!status || status === 'UNKNOWN' || status === 'Não Selecionado') {
                     status = 'Aguardando definição de status';
                 }
                 tradeInText = `Venda à Base de Troca (${status})`;
             }
             
-            // Preenche os campos principais
+            // Preenche os campos
             document.getElementById('detail-business-id').textContent = order.business_id;
             document.getElementById('detail-model').textContent = order.model;
             document.getElementById('detail-client').textContent = order.client;
             
-            // Status e Urgência
             const urgencyText = order.urgency;
             const urgencyBadge = document.getElementById('detail-urgency');
             urgencyBadge.textContent = urgencyText;
             urgencyBadge.className = 'inline-block text-sm font-medium px-2 py-0.5 rounded-full ' + getUrgencyBadge(urgencyText);
             document.getElementById('detail-status').textContent = order.status;
             
-            // Datas
             document.getElementById('detail-created-at').textContent = formatDateTime(order.created_at);
             
-            // Detalhes Adicionais
             document.getElementById('detail-difficulty').textContent = order.difficulty;
             document.getElementById('detail-trade-in').textContent = tradeInText; 
 
-            // Itens Adicionais
+            // Itens Adicionais (Garantido que funciona se o JSON estiver correto)
             document.getElementById('detail-maintenance-extras').innerHTML = formatMaintenanceExtras(order.maintenance_extras);
 
-            // Observações
             document.getElementById('detail-observation').textContent = order.observation || 'Nenhuma observação registrada.';
             
-            // Exibe o modal
             detailsModal.classList.remove('hidden');
             detailsModal.classList.add('flex');
         }
@@ -513,6 +505,7 @@
                 client: formData.get('nome_cliente'),
                 model: formData.get('modelo_turbo'),
                 is_exchange_sale: formData.has('venda_base_troca_check'),
+                // O valor do radio button é o texto completo (e.g., "Já Recebido (Seguir Processo)")
                 exchange_status: formData.has('venda_base_troca_check') ? (formData.get('base_troca_status') || 'Não Selecionado') : null,
                 program_date: formData.get('data_programacao'),
                 urgency: formData.get('grau_urgencia'),
