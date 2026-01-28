@@ -34,20 +34,20 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 pt-16">
+<body class="bg-slate-100 pt-20"> <!-- Acomoda o header maior -->
 
-    <!-- HEADER FIXO (Topo da Tela) -->
-    <header class="fixed top-0 left-0 right-0 h-16 bg-white shadow-md z-10 flex items-center justify-between px-6">
+    <!-- HEADER FIXO (Topo da Tela) - AJUSTADO -->
+    <header class="fixed top-0 left-0 right-0 h-20 bg-white shadow-md z-10 flex items-center justify-between px-8">
         <div class="flex items-center space-x-4">
-            <img src="https://i.postimg.cc/Jh5Jvrc9/IMG-7901.png" alt="Logo TurboSul" class="w-8 h-8">
+            <img src="https://i.postimg.cc/Jh5Jvrc9/IMG-7901.png" alt="Logo TurboSul" class="w-10 h-10"> <!-- Logo aumentada -->
             <div>
-                <h1 class="text-base font-semibold text-gray-800">TurboSul - Controle de Produção</h1>
-                <p class="text-xs text-gray-500">Gerenciamento de Ordens de Serviço</p>
+                <h1 class="text-lg font-bold text-gray-800">TurboSul - Controle de Produção</h1> <!-- Título aumentado -->
+                <p class="text-sm text-gray-500">Gerenciamento de Ordens de Serviço</p>
             </div>
         </div>
 
-        <nav class="flex items-center space-x-4 text-sm text-gray-600">
-            <a href="#" class="px-3 py-1 hover:bg-slate-100 rounded transition duration-150">Quadro de Produção</a>
+        <nav class="flex items-center space-x-6 text-sm text-gray-600">
+            <a href="#" class="px-3 py-1 hover:bg-slate-100 rounded transition duration-150 font-medium">Quadro de Produção</a>
             <span class="text-xs text-gray-400">BR</span>
             <a href="#" class="font-medium text-gray-800 mr-4">Português</a>
 
@@ -55,10 +55,10 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 10a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 00-.707-.293h-1.414a1 1 0 100 2h1.414a1 1 0 00.707-.293zM3.465 5.636L4.172 6.343a1 1 0 001.414-1.414L4.879 4.222a1 1 0 00-1.414 1.414zm.707 7.778l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM10 15a1 1 0 100 2h1a1 1 0 100-2h-1z" clip-rule="evenodd" />
                 </svg>
-                <span class="text-sm">Setor Pré-Vendas</span>
+                <span class="text-sm font-medium">Setor Pré-Vendas</span>
             </div>
 
-            <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-4 rounded-md transition duration-150">Sair</button>
+            <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-4 rounded-md transition duration-150">Sair</button>
         </nav>
     </header>
 
@@ -118,6 +118,7 @@
             </div>
 
             <form id="new-os-form" class="p-6 space-y-6">
+                <!-- Linhas compactadas para reduzir o número de linhas -->
                 <div><label for="orcamento_entrada_num" class="block text-sm font-medium text-gray-700 mb-1">Número do Orçamento / Entrada</label><input type="text" id="orcamento_entrada_num" name="orcamento_entrada_num" placeholder="Ex: ORC-100" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="nome_cliente" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label><input type="text" id="nome_cliente" name="nome_cliente" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="modelo_turbo" class="block text-sm font-medium text-gray-700 mb-1">Modelo do Turbo</label><input type="text" id="modelo_turbo" name="modelo_turbo" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
@@ -128,9 +129,9 @@
                         <label for="venda_base_troca_check" class="ml-2 text-sm font-bold text-gray-800">Venda à Base de Troca</label>
                     </div>
                     <div id="hull-state-options" class="ml-6 space-y-2 text-sm text-gray-700 hidden">
-                        <div class="flex items-center"><input type="radio" id="recebido" name="base_troca_status" value="Recebido" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600"><label for="recebido" class="ml-2">Já Recebido (Seguir Processo)</label></div>
-                        <div class="flex items-center"><input type="radio" id="aguardando_cliente" name="base_troca_status" value="Aguardando Cliente" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600"><label for="aguardando_cliente" class="ml-2">Aguardando Cliente Trazer (Standby)</label></div>
-                        <div class="flex items-center"><input type="radio" id="pago_incluso" name="base_troca_status" value="Pago/Incluso" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600"><label for="pago_incluso" class="ml-2">Pago/Incluso (Seguir Processo)</label></div>
+                        <div class="flex items-center"><input type="radio" id="recebido" name="base_troca_status" value="Já Recebido (Seguir Processo)" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600"><label for="recebido" class="ml-2">Já Recebido (Seguir Processo)</label></div>
+                        <div class="flex items-center"><input type="radio" id="aguardando_cliente" name="base_troca_status" value="Aguardando Cliente Trazer (Standby)" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600"><label for="aguardando_cliente" class="ml-2">Aguardando Cliente Trazer (Standby)</label></div>
+                        <div class="flex items-center"><input type="radio" id="pago_incluso" name="base_troca_status" value="Pago/Incluso (Seguir Processo)" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600"><label for="pago_incluso" class="ml-2">Pago/Incluso (Seguir Processo)</label></div>
                     </div>
                 </div>
 
@@ -188,47 +189,23 @@
                 
                 <!-- Informações Principais -->
                 <div class="grid grid-cols-3 gap-4 border-b pb-4">
-                    <div>
-                        <p class="text-gray-500 font-medium">Nº ORÇAMENTO / ENTRADA</p>
-                        <p id="detail-business-id" class="text-lg font-bold text-gray-800">--</p>
-                    </div>
-                    <div>
-                        <p class="text-gray-500 font-medium">MODELO</p>
-                        <p id="detail-model" class="text-gray-800">--</p>
-                    </div>
-                    <div>
-                        <p class="text-gray-500 font-medium">CLIENTE</p>
-                        <p id="detail-client" class="text-gray-800">--</p>
-                    </div>
+                    <div><p class="text-gray-500 font-medium">Nº ORÇAMENTO / ENTRADA</p><p id="detail-business-id" class="text-lg font-bold text-gray-800">--</p></div>
+                    <div><p class="text-gray-500 font-medium">MODELO</p><p id="detail-model" class="text-gray-800">--</p></div>
+                    <div><p class="text-gray-500 font-medium">CLIENTE</p><p id="detail-client" class="text-gray-800">--</p></div>
                 </div>
 
                 <!-- Status e Urgência -->
                 <div class="grid grid-cols-3 gap-4 pb-4">
-                    <div>
-                        <p class="text-gray-500 font-medium">STATUS ATUAL</p>
-                        <span id="detail-status" class="inline-block text-sm font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">--</span>
-                    </div>
-                    <div>
-                        <p class="text-gray-500 font-medium">URGÊNCIA</p>
-                        <span id="detail-urgency" class="inline-block text-sm font-medium px-2 py-0.5 rounded-full">--</span>
-                    </div>
-                    <div>
-                        <p class="text-gray-500 font-medium">DATA DE CRIAÇÃO</p>
-                        <p id="detail-created-at" class="text-gray-800">--</p>
-                    </div>
+                    <div><p class="text-gray-500 font-medium">STATUS ATUAL</p><span id="detail-status" class="inline-block text-sm font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">--</span></div>
+                    <div><p class="text-gray-500 font-medium">URGÊNCIA</p><span id="detail-urgency" class="inline-block text-sm font-medium px-2 py-0.5 rounded-full">--</span></div>
+                    <div><p class="text-gray-500 font-medium">DATA DE CRIAÇÃO</p><p id="detail-created-at" class="text-gray-800">--</p></div>
                 </div>
                 
                 <!-- Detalhes Adicionais -->
                 <h4 class="text-base font-semibold text-gray-800 border-b pb-2">Detalhes Adicionais</h4>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-gray-500 font-medium">GRAU DE DIFICULDADE</p>
-                        <p id="detail-difficulty" class="text-gray-800">--</p>
-                    </div>
-                    <div>
-                        <p class="text-gray-500 font-medium">TIPO DE VENDA</p>
-                        <p id="detail-trade-in" class="text-gray-800">--</p>
-                    </div>
+                    <div><p class="text-gray-500 font-medium">GRAU DE DIFICULDADE</p><p id="detail-difficulty" class="text-gray-800">--</p></div>
+                    <div><p class="text-gray-500 font-medium">TIPO DE VENDA</p><p id="detail-trade-in" class="text-gray-800">--</p></div>
                 </div>
 
                 <!-- Itens Adicionais -->
@@ -250,6 +227,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Inclusão da biblioteca do Supabase via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -282,10 +260,8 @@
         
         const FALLBACK_USER_UID = '8ab0d7ed-055c-4480-a1af-eb0b08894682';
 
-        // Armazena todos os dados de ordens carregados para acesso rápido no modal de detalhes
         let currentOrders = [];
 
-        // Mapeamento dos nomes das chaves de maintenance_extras para exibição amigável
         const MAINTENANCE_MAP = {
             actuator: 'Atuador',
             geometry: 'Geometria Variável',
@@ -294,22 +270,18 @@
         };
 
         // ====================================================================
-        // 2. FUNÇÕES AUXILIARES, RECUPERAÇÃO DE UID E CONTROLE DE MODAL
+        // 2. FUNÇÕES AUXILIARES E DE CONTROLE
         // ====================================================================
 
-        async function getCurrentUserUID() { /* ... (Mantido) ... */
+        async function getCurrentUserUID() { 
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession();
-                if (session && session.user) {
-                    return session.user.id;
-                }
-            } catch (error) {
-                console.error("Erro ao obter a sessão para UID. Usando fallback.", error);
-            }
+                if (session && session.user) { return session.user.id; }
+            } catch (error) { console.error("Erro ao obter a sessão para UID.", error); }
             return FALLBACK_USER_UID;
         }
 
-        function getUrgencyBadge(urgency) { /* ... (Mantido) ... */
+        function getUrgencyBadge(urgency) {
             switch (urgency) {
                 case 'Alta':
                 case 'Urgente': return 'bg-red-500 text-white';
@@ -319,18 +291,16 @@
             }
         }
         
-        function formatDateTime(isoString) { /* ... (Mantido) ... */
+        function formatDateTime(isoString) {
             if (!isoString) return '--';
             try {
                 const date = new Date(isoString);
-                // Formato dd/mm/aaaa hh:mm
                 return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             } catch {
                 return isoString;
             }
         }
 
-        // NOVO: Função para formatar os Itens Adicionais
         function formatMaintenanceExtras(extras) {
             if (!extras || typeof extras !== 'object') {
                 return '<li>Nenhum item adicional selecionado.</li>';
@@ -338,7 +308,7 @@
             
             const selectedItems = Object.keys(extras)
                 .filter(key => extras[key] === true)
-                .map(key => MAINTENANCE_MAP[key] || key); // Mapeia para nome amigável
+                .map(key => MAINTENANCE_MAP[key] || key);
                 
             if (selectedItems.length === 0) {
                 return '<li>Nenhum item adicional selecionado.</li>';
@@ -347,7 +317,7 @@
             return selectedItems.map(item => `<li>${item}</li>`).join('');
         }
         
-        function renderOrderCard(order) { /* ... (Mantido) ... */
+        function renderOrderCard(order) {
             const urgencyText = order.urgency || 'Normal';
             const urgencyClass = getUrgencyBadge(urgencyText);
             
@@ -366,7 +336,7 @@
             `;
         }
 
-        async function loadPendingOrders() { /* ... (Mantido, mas ajustado para mapear corretamente) ... */
+        async function loadPendingOrders() { 
             filaContainer.innerHTML = '';
             loadingMessage.classList.remove('hidden');
             
@@ -381,11 +351,9 @@
                 const responseJson = await response.json(); 
                 
                 let orders = responseJson.data; 
-                if (!Array.isArray(orders)) {
-                    orders = Array.isArray(responseJson) ? responseJson : [];
-                }
+                if (!Array.isArray(orders)) { orders = Array.isArray(responseJson) ? responseJson : []; }
                 
-                // Mapeia os dados REAIS para currentOrders, acessando 'json' e garantindo fallbacks
+                // Mapeia e extrai os dados reais para currentOrders
                 currentOrders = orders.map(rawOrder => {
                     const order = rawOrder.json || rawOrder;
                     return {
@@ -398,10 +366,9 @@
                         difficulty: order.difficulty || 1,
                         is_trade_in: order.is_trade_in || false,
                         hull_state: order.hull_state || 'UNKNOWN',
-                        exchange_status: order.exchange_status || null, // Se o n8n passar o status de troca aqui
+                        exchange_status: order.exchange_status || null, // Valor enviado pelo modal de criação
                         observation: order.observation || null,
                         created_at: order.created_at,
-                        // TRATAMENTO DO maintenance_extras (garante que é um objeto mesmo que venha como string/JSON no CSV)
                         maintenance_extras: (typeof order.maintenance_extras === 'string' && order.maintenance_extras.startsWith('{')) 
                             ? JSON.parse(order.maintenance_extras) 
                             : (order.maintenance_extras || {})
@@ -432,30 +399,19 @@
             }
         }
         
-        function showSuccessModal() { /* ... (Mantido) ... */
-            successModal.classList.remove('hidden');
-            successModal.classList.add('flex');
-        }
-
-        function closeModal() { /* ... (Mantido) ... */
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function closeDetailsModal() {
-            detailsModal.classList.add('hidden');
-            detailsModal.classList.remove('flex');
-        }
-        
-        // FUNÇÃO DE EXIBIÇÃO DE DETALHES (ATUALIZADA)
         function showDetailsModal(order) {
             
-            // Determina o texto do TIPO DE VENDA (resolve UNKNOWN)
+            // --- CORREÇÃO DO TIPO DE VENDA E STATUS DE TROCA ---
             let tradeInText = 'Venda Comum';
             if (order.is_trade_in) {
-                // Tenta usar o status de troca enviado pelo modal, senão usa o hull_state
-                const hullStateDisplay = order.exchange_status || order.hull_state;
-                tradeInText = `Venda à Base de Troca (${hullStateDisplay || 'Desconhecido'})`;
+                // Prioriza o exchange_status (o valor que o usuário selecionou)
+                let status = order.exchange_status || order.hull_state;
+
+                // Mapeia o status UNKNOWN/Aguardando para exibição amigável
+                if (status === 'UNKNOWN' || status === 'Não Selecionado' || status === null) {
+                    status = 'Aguardando definição de status';
+                }
+                tradeInText = `Venda à Base de Troca (${status})`;
             }
             
             // Preenche os campos principais
@@ -468,7 +424,6 @@
             const urgencyBadge = document.getElementById('detail-urgency');
             urgencyBadge.textContent = urgencyText;
             urgencyBadge.className = 'inline-block text-sm font-medium px-2 py-0.5 rounded-full ' + getUrgencyBadge(urgencyText);
-            
             document.getElementById('detail-status').textContent = order.status;
             
             // Datas
@@ -476,9 +431,9 @@
             
             // Detalhes Adicionais
             document.getElementById('detail-difficulty').textContent = order.difficulty;
-            document.getElementById('detail-trade-in').textContent = tradeInText; // CORRIGIDO AQUI
+            document.getElementById('detail-trade-in').textContent = tradeInText; 
 
-            // Itens Adicionais (NOVO)
+            // Itens Adicionais
             document.getElementById('detail-maintenance-extras').innerHTML = formatMaintenanceExtras(order.maintenance_extras);
 
             // Observações
@@ -497,7 +452,6 @@
             document.querySelectorAll('.os-card').forEach(card => {
                 card.addEventListener('click', (event) => {
                     const orderId = event.currentTarget.dataset.orderId;
-                    // Busca os dados completos da ordem salva em currentOrders
                     const orderData = currentOrders.find(o => o.id === orderId);
                     
                     if (orderData) {
@@ -509,16 +463,29 @@
             });
         }
         
-        // Listener para fechar o modal de detalhes
-        closeDetailsBtn.addEventListener('click', closeDetailsModal);
+        function showSuccessModal() {
+            successModal.classList.remove('hidden');
+            successModal.classList.add('flex');
+        }
 
-        // ... (Outros Listeners mantidos) ...
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeDetailsModal() {
+            detailsModal.classList.add('hidden');
+            detailsModal.classList.remove('flex');
+        }
+        
         successOkBtn.addEventListener('click', async () => {
             successModal.classList.add('hidden');
             successModal.classList.remove('flex');
             closeModal(); 
             await loadPendingOrders(); 
         });
+
+        closeDetailsBtn.addEventListener('click', closeDetailsModal);
 
         document.getElementById('close-modal-btn').addEventListener('click', closeModal);
         document.getElementById('cancel-modal-btn').addEventListener('click', closeModal);
@@ -573,7 +540,6 @@
             }
         });
         
-        // LÓGICA DE INICIALIZAÇÃO E PROTEÇÃO
         (async function initDashboard() {
             const { data: { session }, error } = await supabaseClient.auth.getSession();
 
@@ -590,7 +556,6 @@
             });
         })();
 
-        // LÓGICA DO BOTÃO DESPACHAR TUDO (Placeholder)
         document.getElementById('despachar-tudo-btn').addEventListener('click', () => {
             alert('Ação "Despachar Tudo para Análise" ainda não implementada.');
         });
