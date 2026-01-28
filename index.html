@@ -252,15 +252,16 @@
 
                 const responseJson = await response.json(); 
                 
-                // >>> DIAGNÓSTICO: A imagem mostra que o array está encapsulado em 'data'.
-                // CORREÇÃO: Tenta pegar o array da propriedade 'data' e, se não for um array, assume que está vazio.
+                // >>> CORREÇÃO FINAL BASEADA NA IMAGEM DO CONSOLE
+                // A resposta é um objeto contendo o array na chave 'data'.
                 let orders = responseJson.data; 
                 
+                // Se responseJson.data não existe ou não é um array (ex: se o n8n envia um array direto)
                 if (!Array.isArray(orders)) {
-                    orders = [];
+                    // Tentativa de fallback para o array raiz (caso o n8n mude o output)
+                    orders = Array.isArray(responseJson) ? responseJson : [];
                 }
                 
-                // >>> MANTIDO PARA DEBUGGING: VAI CONFIRMAR QUE 'orders' AGORA É O ARRAY CORRETO
                 console.log("Resposta JSON completa recebida:", responseJson);
                 console.log("Array de ordens final (orders):", orders);
                 
@@ -275,6 +276,7 @@
                 filaCountSpan.textContent = orders.length;
                 
                 orders.forEach(order => {
+                    // Os fallbacks garantem que, mesmo que o dado venha null/undefined, a renderização não quebre.
                     const orderToRender = {
                         business_id: order.business_id || `PRE-${Math.floor(Math.random() * 1000)}`,
                         model: order.model || 'Modelo Desconhecido',
