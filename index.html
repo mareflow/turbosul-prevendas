@@ -67,7 +67,6 @@
 
         <div class="text-sm mb-4">
             <span class="text-brand-blue border-b-2 border-brand-blue font-medium pb-1">Entrada / Programação</span>
-            <!-- Outras abas (placeholder) -->
         </div>
 
         <!-- Layout de Duas Colunas -->
@@ -100,11 +99,10 @@
         </div>
     </main>
 
-    <!-- MODAL: Abertura de Entrada / Orçamento (Mantido) -->
+    <!-- MODAL: Abertura de Entrada / Orçamento -->
     <div id="new-os-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
         <div class="bg-white w-full max-w-xl rounded-xl shadow-2xl transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto">
             
-            <!-- Modal Header -->
             <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
                 <h3 class="text-xl font-semibold text-gray-800">Abertura de Entrada / Orçamento</h3>
                 <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600 transition">
@@ -112,14 +110,11 @@
                 </button>
             </div>
 
-            <!-- Modal Body (Formulário) -->
             <form id="new-os-form" class="p-6 space-y-6">
-                <!-- Campos -->
                 <div><label for="orcamento_entrada_num" class="block text-sm font-medium text-gray-700 mb-1">Número do Orçamento / Entrada</label><input type="text" id="orcamento_entrada_num" name="orcamento_entrada_num" placeholder="Ex: ORC-100" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="nome_cliente" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label><input type="text" id="nome_cliente" name="nome_cliente" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="modelo_turbo" class="block text-sm font-medium text-gray-700 mb-1">Modelo do Turbo</label><input type="text" id="modelo_turbo" name="modelo_turbo" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
 
-                <!-- Venda à Base de Troca -->
                 <div class="p-4 rounded-lg bg-amber-50 border border-amber-200 space-y-3">
                     <div class="flex items-center">
                         <input type="checkbox" id="venda_base_troca_check" name="venda_base_troca_check" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue">
@@ -132,11 +127,9 @@
                     </div>
                 </div>
 
-                <!-- Mais Campos -->
                 <div><label for="data_programacao" class="block text-sm font-medium text-gray-700 mb-1">Data de Programação</label><input type="date" id="data_programacao" name="data_programacao" value="" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="grau_urgencia" class="block text-sm font-medium text-gray-700 mb-1">Grau de Urgência</label><select id="grau_urgencia" name="grau_urgencia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"><option value="Baixa">Baixa</option><option value="Normal" selected>Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div>
                 
-                <!-- Itens Adicionais (Checkboxes) -->
                 <div class="p-4 rounded-lg bg-blue-50 border border-blue-200">
                     <p class="text-sm font-medium text-gray-700 mb-3">Itens Adicionais (Check)</p>
                     <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
@@ -147,15 +140,27 @@
                     </div>
                 </div>
                 
-                <!-- Observações -->
                 <div><label for="observacoes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label><textarea id="observacoes" name="observacoes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea></div>
             </form>
 
-            <!-- Modal Footer -->
             <div class="p-4 border-t bg-slate-50 flex justify-end space-x-3 sticky bottom-0">
                 <button type="button" id="cancel-modal-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-150">Cancelar</button>
                 <button type="submit" form="new-os-form" class="bg-brand-blue hover:bg-brand-blue-dark text-white font-medium py-2 px-4 rounded-lg transition duration-150">Criar Entrada</button>
             </div>
+        </div>
+    </div>
+    
+    <!-- NOVO MODAL: Confirmação de Sucesso (CUSTOMIZADO TAILWIND) -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-[100]">
+        <div class="bg-white w-full max-w-sm rounded-xl shadow-2xl p-6 text-center">
+            <div class="flex flex-col items-center mb-4">
+                <svg class="w-12 h-12 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <h3 class="text-xl font-bold text-gray-800">Sucesso!</h3>
+                <p class="text-gray-600 mt-2">Ordem de Serviço criada com sucesso.</p>
+            </div>
+            <button id="success-modal-ok-btn" class="w-full bg-brand-blue hover:bg-brand-blue-dark text-white font-medium py-2 px-4 rounded-lg transition duration-150">
+                OK
+            </button>
         </div>
     </div>
 
@@ -163,7 +168,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- Lógica de Frontend com JavaScript Puro (Vanilla JS) -->
-<script>
+    <script>
         // ====================================================================
         // 1. CONFIGURAÇÃO E INICIALIZAÇÃO
         // ====================================================================
@@ -179,54 +184,42 @@
         const filaContainer = document.getElementById('fila-do-dia-container');
         const filaCountSpan = document.getElementById('fila-count');
         const loadingMessage = document.getElementById('loading-message');
-        const modal = document.getElementById('new-os-modal');
+        const modal = document.getElementById('new-os-modal'); // Modal de Criação
+        const successModal = document.getElementById('success-modal'); // Modal de Sucesso
         const form = document.getElementById('new-os-form');
-        
         const baseTrocaCheck = document.getElementById('venda_base_troca_check');
         const baseTrocaRadiosDiv = document.getElementById('hull-state-options');
+        const successOkBtn = document.getElementById('success-modal-ok-btn');
         
-        // UID de Fallback
         const FALLBACK_USER_UID = '8ab0d7ed-055c-4480-a1af-eb0b08894682';
 
-
         // ====================================================================
-        // 2. FUNÇÕES AUXILIARES E DE RECUPERAÇÃO DE UID (NOVA FUNÇÃO)
+        // 2. FUNÇÕES AUXILIARES, RECUPERAÇÃO DE UID E CONTROLE DE MODAL
         // ====================================================================
 
-        /**
-         * Busca o UID do usuário logado via Supabase.
-         * @returns {Promise<string>} O UID do usuário ou o fallback.
-         */
         async function getCurrentUserUID() {
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession();
-                
-                // Retorna o ID se a sessão e o usuário existirem
                 if (session && session.user) {
                     return session.user.id;
                 }
             } catch (error) {
                 console.error("Erro ao obter a sessão para UID. Usando fallback.", error);
             }
-            // Retorna o UID de fallback se não houver sessão ou se houver erro
             return FALLBACK_USER_UID;
         }
 
-        function getUrgencyBadge(urgency) { /* ... (Mantido) ... */
+        function getUrgencyBadge(urgency) {
             switch (urgency) {
                 case 'Alta':
-                case 'Urgente':
-                    return 'bg-red-100 text-red-800';
-                case 'Normal':
-                    return 'bg-yellow-100 text-yellow-800';
-                case 'Baixa':
-                    return 'bg-gray-100 text-gray-800';
-                default:
-                    return 'bg-gray-100 text-gray-800';
+                case 'Urgente': return 'bg-red-100 text-red-800';
+                case 'Normal': return 'bg-yellow-100 text-yellow-800';
+                case 'Baixa': return 'bg-gray-100 text-gray-800';
+                default: return 'bg-gray-100 text-gray-800';
             }
         }
-
-        function renderOrderCard(order) { /* ... (Mantido) ... */
+        
+        function renderOrderCard(order) {
             const urgencyClass = getUrgencyBadge(order.urgency || 'Normal');
             
             return `
@@ -244,15 +237,12 @@
             `;
         }
 
-        async function loadPendingOrders() { /* ... (Mantido) ... */
+        async function loadPendingOrders() {
             filaContainer.innerHTML = '';
             loadingMessage.classList.remove('hidden');
             
             try {
-                const response = await fetch(WEBHOOK_GET, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                });
+                const response = await fetch(WEBHOOK_GET, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
                 if (!response.ok) {
                     throw new Error(`Falha HTTP (Status: ${response.status}) ao buscar dados.`);
@@ -289,10 +279,85 @@
             }
         }
         
+        function showSuccessModal() {
+            successModal.classList.remove('hidden');
+            successModal.classList.add('flex');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
         // ====================================================================
-        // 3. LÓGICA DE AUTENTICAÇÃO E ROTA
+        // 3. LISTENERS E LÓGICA DE CONTROLE
         // ====================================================================
 
+        // Listener do botão OK do modal de sucesso: Recarrega a fila
+        successOkBtn.addEventListener('click', async () => {
+            successModal.classList.add('hidden');
+            successModal.classList.remove('flex');
+            closeModal(); 
+            await loadPendingOrders(); 
+        });
+
+        // Listeners do Modal de Criação 
+        document.getElementById('close-modal-btn').addEventListener('click', closeModal);
+        document.getElementById('cancel-modal-btn').addEventListener('click', closeModal);
+        document.getElementById('novo-orcamento-btn').addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            form.reset(); 
+            document.getElementById('data_programacao').valueAsDate = new Date();
+            baseTrocaRadiosDiv.classList.add('hidden'); 
+        });
+
+        // Listener Checkbox Venda à Base de Troca
+        baseTrocaCheck.addEventListener('change', (event) => {
+            baseTrocaRadiosDiv.classList.toggle('hidden', !event.target.checked);
+        });
+
+        // Lógica de Submissão do Formulário (INCLUI user_id)
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const userId = await getCurrentUserUID(); 
+
+            const formData = new FormData(form);
+            const data = {
+                user_id: userId, 
+                business_id: formData.get('orcamento_entrada_num'),
+                client: formData.get('nome_cliente'),
+                model: formData.get('modelo_turbo'),
+                is_exchange_sale: formData.has('venda_base_troca_check'),
+                exchange_status: formData.has('venda_base_troca_check') ? (formData.get('base_troca_status') || 'Não Selecionado') : null,
+                program_date: formData.get('data_programacao'),
+                urgency: formData.get('grau_urgencia'),
+                additional_items: formData.getAll('itens_adicionais'), 
+                observations: formData.get('observacoes'),
+            };
+
+            try {
+                const response = await fetch(WEBHOOK_POST, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.status === 201 || response.ok) { 
+                    closeModal(); 
+                    showSuccessModal(); 
+                } else {
+                    const errorData = await response.json().catch(() => ({ message: 'Sem detalhes de erro no corpo.' }));
+                    alert(`Falha ao criar OS: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
+                }
+            } catch (error) {
+                console.error("Erro no envio POST:", error);
+                alert("Erro de conexão ao tentar criar a Ordem de Serviço.");
+            }
+        });
+        
+        // LÓGICA DE INICIALIZAÇÃO E PROTEÇÃO
         (async function initDashboard() {
             const { data: { session }, error } = await supabaseClient.auth.getSession();
 
@@ -309,77 +374,6 @@
             });
         })();
 
-        // ====================================================================
-        // 4. LÓGICA DO MODAL (NOVA ORDEM) - FUNÇÃO DE SUBMISSÃO REFATORADA
-        // ====================================================================
-        
-        baseTrocaCheck.addEventListener('change', (event) => {
-            baseTrocaRadiosDiv.classList.toggle('hidden', !event.target.checked);
-        });
-
-        document.getElementById('novo-orcamento-btn').addEventListener('click', () => {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            form.reset(); 
-            document.getElementById('data_programacao').valueAsDate = new Date();
-            baseTrocaRadiosDiv.classList.add('hidden'); 
-        });
-
-        document.getElementById('close-modal-btn').addEventListener('click', () => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        });
-        document.getElementById('cancel-modal-btn').addEventListener('click', () => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        });
-
-        // Lógica de Submissão do Formulário (REFATORADA para incluir user_id)
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            
-            // 1. CHAMA A NOVA FUNÇÃO PARA OBTER O UID
-            const userId = await getCurrentUserUID(); 
-
-            const formData = new FormData(form);
-            const data = {
-                // 2. CAMPO user_id ADICIONADO AQUI
-                user_id: userId, 
-
-                business_id: formData.get('orcamento_entrada_num'),
-                client: formData.get('nome_cliente'),
-                model: formData.get('modelo_turbo'),
-                is_exchange_sale: formData.has('venda_base_troca_check'),
-                exchange_status: formData.has('venda_base_troca_check') ? (formData.get('base_troca_status') || 'Não Selecionado') : null,
-                program_date: formData.get('data_programacao'),
-                urgency: formData.get('grau_urgencia'),
-                additional_items: formData.getAll('itens_adicionais'), 
-                observations: formData.get('observacoes'),
-            };
-
-            // 3. Enviar para a Webhook
-            try {
-                const response = await fetch(WEBHOOK_POST, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
-
-                if (response.status === 201 || response.ok) { 
-                    alert("Ordem de Serviço criada com sucesso! A fila será atualizada.");
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    await loadPendingOrders(); 
-                } else {
-                    const errorData = await response.json().catch(() => ({ message: 'Sem detalhes de erro no corpo.' }));
-                    alert(`Falha ao criar OS: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
-                }
-            } catch (error) {
-                console.error("Erro no envio POST:", error);
-                alert("Erro de conexão ao tentar criar a Ordem de Serviço.");
-            }
-        });
-        
         // LÓGICA DO BOTÃO DESPACHAR TUDO (Placeholder)
         document.getElementById('despachar-tudo-btn').addEventListener('click', () => {
             alert('Ação "Despachar Tudo para Análise" ainda não implementada.');
