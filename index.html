@@ -25,6 +25,13 @@
         .hover\:bg-brand-blue-dark:hover {
             background-color: #1D4ED8; 
         }
+        /* Torna os cards clicáveis e dá feedback visual */
+        .os-card:hover {
+            cursor: pointer;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+            transition: all 0.2s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-slate-100 pt-16">
@@ -99,7 +106,7 @@
         </div>
     </main>
 
-    <!-- MODAL: Abertura de Entrada / Orçamento -->
+    <!-- MODAL 1: Abertura de Entrada / Orçamento (Criação) -->
     <div id="new-os-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
         <div class="bg-white w-full max-w-xl rounded-xl shadow-2xl transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto">
             
@@ -109,12 +116,11 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-
+            <!-- ... (Formulário omitido para brevidade, mantido no JS) ... -->
             <form id="new-os-form" class="p-6 space-y-6">
                 <div><label for="orcamento_entrada_num" class="block text-sm font-medium text-gray-700 mb-1">Número do Orçamento / Entrada</label><input type="text" id="orcamento_entrada_num" name="orcamento_entrada_num" placeholder="Ex: ORC-100" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="nome_cliente" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label><input type="text" id="nome_cliente" name="nome_cliente" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="modelo_turbo" class="block text-sm font-medium text-gray-700 mb-1">Modelo do Turbo</label><input type="text" id="modelo_turbo" name="modelo_turbo" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
-
                 <div class="p-4 rounded-lg bg-amber-50 border border-amber-200 space-y-3">
                     <div class="flex items-center">
                         <input type="checkbox" id="venda_base_troca_check" name="venda_base_troca_check" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue">
@@ -126,10 +132,8 @@
                         <div class="flex items-center"><input type="radio" id="pago_incluso" name="base_troca_status" value="Pago/Incluso" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600"><label for="pago_incluso" class="ml-2">Pago/Incluso (Seguir Processo)</label></div>
                     </div>
                 </div>
-
                 <div><label for="data_programacao" class="block text-sm font-medium text-gray-700 mb-1">Data de Programação</label><input type="date" id="data_programacao" name="data_programacao" value="" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="grau_urgencia" class="block text-sm font-medium text-gray-700 mb-1">Grau de Urgência</label><select id="grau_urgencia" name="grau_urgencia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"><option value="Baixa">Baixa</option><option value="Normal" selected>Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div>
-                
                 <div class="p-4 rounded-lg bg-blue-50 border border-blue-200">
                     <p class="text-sm font-medium text-gray-700 mb-3">Itens Adicionais (Check)</p>
                     <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
@@ -139,7 +143,6 @@
                         <div class="flex items-center"><input type="checkbox" name="itens_adicionais" value="Flange da Geometria" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue"><label class="ml-2">Flange da Geometria</label></div>
                     </div>
                 </div>
-                
                 <div><label for="observacoes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label><textarea id="observacoes" name="observacoes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea></div>
             </form>
 
@@ -150,7 +153,7 @@
         </div>
     </div>
     
-    <!-- MODAL: Confirmação de Sucesso -->
+    <!-- MODAL 2: Confirmação de Sucesso -->
     <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-[100]">
         <div class="bg-white w-full max-w-sm rounded-xl shadow-2xl p-6 text-center">
             <div class="flex flex-col items-center mb-4">
@@ -161,6 +164,78 @@
             <button id="success-modal-ok-btn" class="w-full bg-brand-blue hover:bg-brand-blue-dark text-white font-medium py-2 px-4 rounded-lg transition duration-150">
                 OK
             </button>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Detalhes do Processo (Visualização/Leitura) - NOVO MODAL -->
+    <div id="details-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl">
+            
+            <!-- Header do Modal de Detalhes -->
+            <div class="p-6 border-b flex justify-between items-center">
+                <h3 class="text-xl font-semibold text-gray-800">Detalhes do Processo</h3>
+                <button id="close-details-modal-btn" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Corpo do Modal de Detalhes -->
+            <div class="p-6 space-y-5 text-sm">
+                
+                <!-- Informações Principais -->
+                <div class="grid grid-cols-3 gap-4 border-b pb-4">
+                    <div>
+                        <p class="text-gray-500 font-medium">Nº ORÇAMENTO / ENTRADA</p>
+                        <p id="detail-business-id" class="text-lg font-bold text-gray-800">--</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 font-medium">MODELO</p>
+                        <p id="detail-model" class="text-gray-800">--</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 font-medium">CLIENTE</p>
+                        <p id="detail-client" class="text-gray-800">--</p>
+                    </div>
+                </div>
+
+                <!-- Status e Urgência -->
+                <div class="grid grid-cols-3 gap-4 pb-4">
+                    <div>
+                        <p class="text-gray-500 font-medium">STATUS ATUAL</p>
+                        <span id="detail-status" class="inline-block text-sm font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">--</span>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 font-medium">URGÊNCIA</p>
+                        <span id="detail-urgency" class="inline-block text-sm font-medium px-2 py-0.5 rounded-full">--</span>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 font-medium">DATA DE CRIAÇÃO</p>
+                        <p id="detail-created-at" class="text-gray-800">--</p>
+                    </div>
+                </div>
+                
+                <!-- Detalhes Adicionais -->
+                <h4 class="text-base font-semibold text-gray-800 border-b pb-2">Detalhes Adicionais</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-gray-500 font-medium">GRAU DE DIFICULDADE</p>
+                        <p id="detail-difficulty" class="text-gray-800">--</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500 font-medium">TIPO DE VENDA</p>
+                        <p id="detail-trade-in" class="text-gray-800">--</p>
+                    </div>
+                </div>
+
+                <!-- Observações e Histórico -->
+                <div class="space-y-2">
+                    <p class="text-gray-500 font-medium">OBSERVAÇÕES</p>
+                    <p id="detail-observation" class="bg-slate-50 p-3 rounded-lg text-gray-800 italic">Nenhuma observação registrada.</p>
+                </div>
+                
+                <h4 class="text-base font-semibold text-gray-800 border-b pb-2 pt-4">Histórico de Eventos</h4>
+                <p class="text-gray-500 italic">Funcionalidade de histórico não implementada (Placeholder).</p>
+            </div>
         </div>
     </div>
 
@@ -184,14 +259,19 @@
         const filaContainer = document.getElementById('fila-do-dia-container');
         const filaCountSpan = document.getElementById('fila-count');
         const loadingMessage = document.getElementById('loading-message');
-        const modal = document.getElementById('new-os-modal');
-        const successModal = document.getElementById('success-modal');
+        const modal = document.getElementById('new-os-modal'); // Criação
+        const successModal = document.getElementById('success-modal'); // Sucesso
+        const detailsModal = document.getElementById('details-modal'); // Detalhes (NOVO)
         const form = document.getElementById('new-os-form');
         const baseTrocaCheck = document.getElementById('venda_base_troca_check');
         const baseTrocaRadiosDiv = document.getElementById('hull-state-options');
         const successOkBtn = document.getElementById('success-modal-ok-btn');
+        const closeDetailsBtn = document.getElementById('close-details-modal-btn');
         
         const FALLBACK_USER_UID = '8ab0d7ed-055c-4480-a1af-eb0b08894682';
+
+        // Armazena todos os dados de ordens carregados para acesso rápido no modal de detalhes
+        let currentOrders = [];
 
         // ====================================================================
         // 2. FUNÇÕES AUXILIARES, RECUPERAÇÃO DE UID E CONTROLE DE MODAL
@@ -212,10 +292,21 @@
         function getUrgencyBadge(urgency) {
             switch (urgency) {
                 case 'Alta':
-                case 'Urgente': return 'bg-red-100 text-red-800';
-                case 'Normal': return 'bg-yellow-100 text-yellow-800';
+                case 'Urgente': return 'bg-red-500 text-white'; // Ajuste de cor para visualização
+                case 'Normal': return 'bg-yellow-200 text-yellow-800';
                 case 'Baixa': return 'bg-gray-100 text-gray-800';
                 default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+        
+        function formatDateTime(isoString) {
+            if (!isoString) return '--';
+            try {
+                const date = new Date(isoString);
+                // Formato dd/mm/aaaa hh:mm
+                return date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            } catch {
+                return isoString;
             }
         }
         
@@ -223,8 +314,9 @@
             const urgencyText = order.urgency || 'Normal';
             const urgencyClass = getUrgencyBadge(urgencyText);
             
+            // Adiciona data-id para identificação do clique
             return `
-                <div class="bg-white p-4 rounded-lg shadow border border-gray-200 flex justify-between items-center">
+                <div class="os-card bg-white p-4 rounded-lg shadow border border-gray-200 flex justify-between items-center" data-order-id="${order.id}">
                     <div>
                         <p class="text-lg font-bold text-gray-800">${order.business_id}</p>
                         <p class="text-sm text-gray-600">${order.model}</p>
@@ -252,33 +344,29 @@
 
                 const responseJson = await response.json(); 
                 
-                // CORREÇÃO CRÍTICA FINAL: Acessa o array da propriedade 'data' do objeto principal
                 let orders = responseJson.data; 
                 
-                // Se a resposta não veio encapsulada, tenta o array raiz
                 if (!Array.isArray(orders)) {
                     orders = Array.isArray(responseJson) ? responseJson : [];
                 }
                 
-                console.log("Resposta JSON completa recebida:", responseJson);
-                console.log("Array de ordens final (orders):", orders);
-                
+                // Mapeia e extrai os dados reais antes de armazenar
+                currentOrders = orders.map(rawOrder => rawOrder.json || rawOrder); 
+
                 loadingMessage.classList.add('hidden');
                 
-                if (orders.length === 0) {
+                if (currentOrders.length === 0) {
                     filaContainer.innerHTML = '<p class="text-gray-500 text-center mt-8">Nenhuma ordem de serviço pendente na fila.</p>';
                     filaCountSpan.textContent = '0';
                     return;
                 }
 
-                filaCountSpan.textContent = orders.length;
+                filaCountSpan.textContent = currentOrders.length;
                 
-                orders.forEach(rawOrder => {
-                    // EXTRAÇÃO CORRIGIDA: Pega os dados da sub-propriedade 'json'
-                    const order = rawOrder.json || rawOrder; 
-
-                    // Renderização com fallbacks
+                currentOrders.forEach(order => {
+                    // Prepara o objeto para a renderização do card
                     const orderToRender = {
+                        id: order.id, // ID é necessário para o listener de clique
                         business_id: order.business_id || `PRE-${Math.floor(Math.random() * 1000)}`,
                         model: order.model || 'Modelo Desconhecido',
                         client: order.client || 'Cliente Desconhecido',
@@ -286,6 +374,9 @@
                     };
                     filaContainer.insertAdjacentHTML('beforeend', renderOrderCard(orderToRender));
                 });
+                
+                // Adiciona listeners de clique após a renderização
+                addCardClickListeners();
 
             } catch (error) {
                 console.error("Erro ao carregar ordens:", error);
@@ -305,10 +396,62 @@
             modal.classList.remove('flex');
         }
 
+        function closeDetailsModal() {
+            detailsModal.classList.add('hidden');
+            detailsModal.classList.remove('flex');
+        }
+        
+        // FUNÇÃO DE EXIBIÇÃO DE DETALHES (NOVA)
+        function showDetailsModal(order) {
+            
+            // Preenche os campos principais
+            document.getElementById('detail-business-id').textContent = order.business_id || '--';
+            document.getElementById('detail-model').textContent = order.model || '--';
+            document.getElementById('detail-client').textContent = order.client || '--';
+            
+            // Status e Urgência
+            const urgencyText = order.urgency || 'Normal';
+            const urgencyBadge = document.getElementById('detail-urgency');
+            urgencyBadge.textContent = urgencyText;
+            urgencyBadge.className = 'inline-block text-sm font-medium px-2 py-0.5 rounded-full ' + getUrgencyBadge(urgencyText);
+            
+            document.getElementById('detail-status').textContent = order.status || 'Não Iniciado';
+            
+            // Datas
+            document.getElementById('detail-created-at').textContent = formatDateTime(order.created_at);
+            
+            // Detalhes Adicionais
+            document.getElementById('detail-difficulty').textContent = order.difficulty || 'Não Avaliado';
+            document.getElementById('detail-trade-in').textContent = order.is_trade_in ? `Venda à Base de Troca (${order.hull_state || 'Pendente'})` : 'Venda Comum';
+
+            // Observações
+            document.getElementById('detail-observation').textContent = order.observation || 'Nenhuma observação registrada.';
+            
+            // Exibe o modal
+            detailsModal.classList.remove('hidden');
+            detailsModal.classList.add('flex');
+        }
+
         // ====================================================================
         // 3. LISTENERS E LÓGICA DE CONTROLE
         // ====================================================================
 
+        function addCardClickListeners() {
+            document.querySelectorAll('.os-card').forEach(card => {
+                card.addEventListener('click', (event) => {
+                    const orderId = event.currentTarget.dataset.orderId;
+                    const orderData = currentOrders.find(o => o.id === orderId);
+                    
+                    if (orderData) {
+                        showDetailsModal(orderData);
+                    } else {
+                        alert("Detalhes da Ordem não encontrados!");
+                    }
+                });
+            });
+        }
+        
+        // Listener do botão OK do modal de sucesso
         successOkBtn.addEventListener('click', async () => {
             successModal.classList.add('hidden');
             successModal.classList.remove('flex');
@@ -316,6 +459,10 @@
             await loadPendingOrders(); 
         });
 
+        // Listener para fechar o modal de detalhes
+        closeDetailsBtn.addEventListener('click', closeDetailsModal);
+
+        // Listeners dos Modais de Criação (Mantidos)
         document.getElementById('close-modal-btn').addEventListener('click', closeModal);
         document.getElementById('cancel-modal-btn').addEventListener('click', closeModal);
         document.getElementById('novo-orcamento-btn').addEventListener('click', () => {
