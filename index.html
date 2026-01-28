@@ -34,7 +34,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 pt-20"> 
+<body class="bg-slate-100 pt-20">
 
     <!-- HEADER FIXO (Topo da Tela) -->
     <header class="fixed top-0 left-0 right-0 h-20 bg-white shadow-md z-10 flex items-center justify-between px-8">
@@ -263,6 +263,14 @@
             geometryFlange: 'Flange da Geometria'
         };
 
+        // NOVO: Mapeamento do código do Supabase/Enum para texto amigável
+        const HULL_STATE_MAP = {
+            'RECEIVED': 'Já Recebido (Seguir Processo)',
+            'WAITING': 'Aguardando Cliente Trazer (Standby)',
+            'PAID': 'Pago/Incluso (Seguir Processo)',
+            'UNKNOWN': 'Aguardando definição de status' 
+        };
+
         // ====================================================================
         // 2. FUNÇÕES AUXILIARES E DE CONTROLE
         // ====================================================================
@@ -347,7 +355,6 @@
                 let orders = responseJson.data; 
                 if (!Array.isArray(orders)) { orders = Array.isArray(responseJson) ? responseJson : []; }
                 
-                // Mapeia e extrai os dados reais para currentOrders
                 currentOrders = orders.map(rawOrder => {
                     const order = rawOrder.json || rawOrder;
                     return {
@@ -369,7 +376,7 @@
                     };
                 });
                 
-                // >>>>> ADIÇÃO CRÍTICA PARA DEBUGGING: Verifique o console <<<<<
+                // >>>>> PONTO DE DEBUG CRÍTICO: Verifique este log no console <<<<<
                 console.log("Array de ordens (currentOrders):", currentOrders);
 
 
@@ -399,13 +406,14 @@
         
         function showDetailsModal(order) {
             
-            // --- TRATAMENTO DO TIPO DE VENDA (Garantido para não ser UNKNOWN) ---
+            // --- TRATAMENTO DO TIPO DE VENDA (PRIORIZA HULL_STATE MAIS LEGÍVEL) ---
             let tradeInText = 'Venda Comum';
             if (order.is_trade_in) {
-                let status = order.exchange_status; // Tenta pegar o valor do modal de criação
-                
-                // Se o status do modal de criação falhou, tenta o status do banco (hull_state)
-                if (!status || status === 'UNKNOWN' || status === 'Não Selecionado') {
+                // 1. Tenta traduzir o Hull State (RECEIVED, WAITING, PAID)
+                let status = HULL_STATE_MAP[order.hull_state] || order.hull_state;
+
+                // 2. Se a tradução falhou, cai no fallback genérico
+                if (!status || status === 'UNKNOWN') {
                     status = 'Aguardando definição de status';
                 }
                 tradeInText = `Venda à Base de Troca (${status})`;
@@ -427,7 +435,7 @@
             document.getElementById('detail-difficulty').textContent = order.difficulty;
             document.getElementById('detail-trade-in').textContent = tradeInText; 
 
-            // Itens Adicionais (Garantido que funciona se o JSON estiver correto)
+            // Itens Adicionais
             document.getElementById('detail-maintenance-extras').innerHTML = formatMaintenanceExtras(order.maintenance_extras);
 
             document.getElementById('detail-observation').textContent = order.observation || 'Nenhuma observação registrada.';
@@ -505,7 +513,6 @@
                 client: formData.get('nome_cliente'),
                 model: formData.get('modelo_turbo'),
                 is_exchange_sale: formData.has('venda_base_troca_check'),
-                // O valor do radio button é o texto completo (e.g., "Já Recebido (Seguir Processo)")
                 exchange_status: formData.has('venda_base_troca_check') ? (formData.get('base_troca_status') || 'Não Selecionado') : null,
                 program_date: formData.get('data_programacao'),
                 urgency: formData.get('grau_urgencia'),
