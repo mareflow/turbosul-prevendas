@@ -219,7 +219,7 @@
             }
         }
         
-        // CORREÇÃO APLICADA AQUI
+        // REESCRITO CONFORME SOLICITADO
         function renderOrderCard(order) {
             const urgencyText = order.urgency || 'Normal';
             const urgencyClass = getUrgencyBadge(urgencyText);
@@ -239,6 +239,7 @@
             `;
         }
 
+        // REESCRITO CONFORME SOLICITADO (REMOÇÃO DO .data)
         async function loadPendingOrders() {
             filaContainer.innerHTML = '';
             loadingMessage.classList.remove('hidden');
@@ -247,11 +248,13 @@
                 const response = await fetch(WEBHOOK_GET, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
                 if (!response.ok) {
-                    throw new Error(`Falha HTTP (Status: ${response.status}) ao buscar dados.`);
+                    // Tenta ler o erro do backend se houver falha HTTP
+                    const errorText = await response.text();
+                    throw new Error(`Falha HTTP (Status: ${response.status}). Resposta: ${errorText.substring(0, 50)}...`);
                 }
 
-                const responseJson = await response.json();
-                const orders = responseJson.data; 
+                // CORREÇÃO: Lê a resposta como um array JSON diretamente
+                const orders = await response.json(); 
 
                 loadingMessage.classList.add('hidden');
                 
@@ -264,7 +267,7 @@
                 filaCountSpan.textContent = orders.length;
                 
                 orders.forEach(order => {
-                    // CORREÇÃO APLICADA AQUI: Usando fallback simples
+                    // CORREÇÃO: Usando fallbacks limpos (ORC-ID é o único que precisa de lógica de ID)
                     const orderToRender = {
                         business_id: order.business_id || `PRE-${Math.floor(Math.random() * 1000)}`,
                         model: order.model || 'Modelo Desconhecido',
