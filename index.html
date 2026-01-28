@@ -11,99 +11,391 @@
     <!-- Importação da fonte 'Inter' do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Estilos customizados e animações -->
+    <!-- Estilos Customizados -->
     <style>
-        /* Define a fonte 'Inter' como padrão para toda a página */
         body {
             font-family: 'Inter', sans-serif;
         }
-
-        /* Animação de entrada para o card, replicando o login */
-        @keyframes fadeInScaleUp {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        /* Cor de destaque principal (Blue-600) */
+        .bg-brand-blue {
+            background-color: #2563EB; 
         }
-
-        .animate-entry {
-            animation: fadeInScaleUp 0.5s ease-out forwards;
+        .hover\:bg-brand-blue-dark:hover {
+            background-color: #1D4ED8; 
         }
     </style>
 </head>
-<body class="bg-slate-100 flex items-center justify-center min-h-screen px-4">
+<body class="bg-slate-100 pt-16">
 
-    <!-- Card Principal com o Conteúdo do Dashboard de Pré-Vendas -->
-    <main class="w-full max-w-md bg-white rounded-xl shadow-lg p-10 text-center animate-entry">
-        <!-- Logo e Título -->
-        <div class="flex flex-col items-center mb-6">
-            <img src="https://i.postimg.cc/Jh5Jvrc9/IMG-7901.png" alt="Logo TurboSul" class="w-24 h-24 mb-4">
-            <h1 class="text-2xl font-bold text-gray-800">Dashboard Pré-Vendas</h1>
+    <!-- HEADER FIXO (Topo da Tela) -->
+    <header class="fixed top-0 left-0 right-0 h-16 bg-white shadow-md z-10 flex items-center justify-between px-6">
+        <div class="flex items-center space-x-4">
+            <img src="https://i.postimg.cc/Jh5Jvrc9/IMG-7901.png" alt="Logo TurboSul" class="w-8 h-8">
+            <div>
+                <h1 class="text-base font-semibold text-gray-800">TurboSul - Controle de Produção</h1>
+                <p class="text-xs text-gray-500">Gerenciamento de Ordens de Serviço</p>
+            </div>
         </div>
 
-        <!-- Mensagem de Sucesso -->
-        <div class="mb-8">
-            <p class="text-lg text-green-600 font-semibold mb-2">🎉 Autenticação bem-sucedida!</p>
-            <p class="text-gray-600">Sua área de trabalho está pronta para o controle de produção.</p>
+        <nav class="flex items-center space-x-4 text-sm text-gray-600">
+            <a href="#" class="px-3 py-1 hover:bg-slate-100 rounded transition duration-150">Quadro de Produção</a>
+            <span class="text-xs text-gray-400">BR</span>
+            <a href="#" class="font-medium text-gray-800 mr-4">Português</a>
+
+            <div class="flex items-center space-x-2 text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 10a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 00-.707-.293h-1.414a1 1 0 100 2h1.414a1 1 0 00.707-.293zM3.465 5.636L4.172 6.343a1 1 0 001.414-1.414L4.879 4.222a1 1 0 00-1.414 1.414zm.707 7.778l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM10 15a1 1 0 100 2h1a1 1 0 100-2h-1z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-sm">Setor Pré-Vendas</span>
+            </div>
+
+            <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-4 rounded-md transition duration-150">Sair</button>
+        </nav>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="p-6 lg:p-10">
+        <!-- Título da Página e Botão de Ação -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800">Pré-Vendas / Entrada</h2>
+            <button id="novo-orcamento-btn" class="bg-brand-blue hover:bg-brand-blue-dark text-white font-medium py-2 px-4 rounded-md shadow transition duration-200">
+                Novo Orçamento
+            </button>
         </div>
 
-        <!-- Botão de Sair (Logout) -->
-        <button 
-            id="logout-button"
-            class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-red-600 focus:ring-opacity-50 transition-all duration-300 ease-in-out"
-        >
-            Sair
-        </button>
+        <div class="text-sm mb-4">
+            <span class="text-brand-blue border-b-2 border-brand-blue font-medium pb-1">Entrada / Programação</span>
+            <!-- Outras abas (placeholder) -->
+        </div>
+
+        <!-- Layout de Duas Colunas -->
+        <div class="lg:flex lg:space-x-8 space-y-6 lg:space-y-0">
+            <!-- Coluna 1: Fila do Dia (60%) -->
+            <div class="lg:w-3/5">
+                <div class="bg-green-100 p-4 rounded-lg shadow-sm border border-green-200 mb-4 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-green-700">Fila do Dia (Despachar para Análise)</h3>
+                    <button id="despachar-tudo-btn" class="bg-green-600 hover:bg-green-700 text-white font-medium text-sm py-1.5 px-3 rounded transition duration-200">
+                        Despachar Tudo para Análise (<span id="fila-count">0</span>)
+                    </button>
+                </div>
+                
+                <!-- Container Dinâmico para os Cards da Fila -->
+                <div id="fila-do-dia-container" class="space-y-4">
+                    <!-- Cards de OS serão injetados aqui via JavaScript -->
+                    <p id="loading-message" class="text-gray-500 text-center mt-8">Carregando ordens...</p>
+                </div>
+            </div>
+
+            <!-- Coluna 2: Programação Futura (40%) -->
+            <div class="lg:w-2/5">
+                <div class="bg-blue-100 p-4 rounded-lg shadow-sm border border-blue-200 mb-4">
+                    <h3 class="text-lg font-semibold text-blue-700">Programação Futura (Aguardando Data)</h3>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 text-center">
+                    <p class="text-gray-500 italic">Nenhuma programação futura.</p>
+                </div>
+            </div>
+        </div>
     </main>
+
+    <!-- MODAL: Abertura de Entrada / Orçamento -->
+    <div id="new-os-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+        <div class="bg-white w-full max-w-xl rounded-xl shadow-2xl transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto">
+            
+            <!-- Modal Header -->
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
+                <h3 class="text-xl font-semibold text-gray-800">Abertura de Entrada / Orçamento</h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Modal Body (Formulário) -->
+            <form id="new-os-form" class="p-6 space-y-6">
+                <!-- Número do Orçamento / Entrada -->
+                <div>
+                    <label for="orcamento_entrada_num" class="block text-sm font-medium text-gray-700 mb-1">Número do Orçamento / Entrada</label>
+                    <input type="text" id="orcamento_entrada_num" name="orcamento_entrada_num" placeholder="Ex: ORC-100" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Nome do Cliente -->
+                <div>
+                    <label for="nome_cliente" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
+                    <input type="text" id="nome_cliente" name="nome_cliente" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Modelo do Turbo -->
+                <div>
+                    <label for="modelo_turbo" class="block text-sm font-medium text-gray-700 mb-1">Modelo do Turbo</label>
+                    <input type="text" id="modelo_turbo" name="modelo_turbo" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Venda à Base de Troca -->
+                <div class="p-4 rounded-lg bg-amber-50 border border-amber-200 space-y-3">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="venda_base_troca" name="venda_base_troca" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue">
+                        <label for="venda_base_troca" class="ml-2 text-sm font-bold text-gray-800">Venda à Base de Troca</label>
+                    </div>
+
+                    <div id="base-troca-radios" class="ml-6 space-y-2 text-sm text-gray-700">
+                        <div class="flex items-center">
+                            <input type="radio" id="recebido" name="base_troca_status" value="Recebido" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600">
+                            <label for="recebido" class="ml-2">Já Recebido (Seguir Processo)</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="aguardando_cliente" name="base_troca_status" value="Aguardando Cliente" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600">
+                            <label for="aguardando_cliente" class="ml-2">Aguardando Cliente Trazer (Standby)</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="pago_incluso" name="base_troca_status" value="Pago/Incluso" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600">
+                            <label for="pago_incluso" class="ml-2">Pago/Incluso (Seguir Processo)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data de Programação -->
+                <div>
+                    <label for="data_programacao" class="block text-sm font-medium text-gray-700 mb-1">Data de Programação</label>
+                    <input type="date" id="data_programacao" name="data_programacao" value=""
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Grau de Urgência -->
+                <div>
+                    <label for="grau_urgencia" class="block text-sm font-medium text-gray-700 mb-1">Grau de Urgência</label>
+                    <select id="grau_urgencia" name="grau_urgencia" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <option value="Baixa">Baixa</option>
+                        <option value="Normal" selected>Normal</option>
+                        <option value="Alta">Alta</option>
+                        <option value="Urgente">Urgente</option>
+                    </select>
+                </div>
+
+                <!-- Itens Adicionais (Checkboxes) -->
+                <div class="p-4 rounded-lg bg-blue-50 border border-blue-200">
+                    <p class="text-sm font-medium text-gray-700 mb-3">Itens Adicionais (Check)</p>
+                    <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
+                        <div class="flex items-center"><input type="checkbox" name="itens_adicionais" value="Atuador" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue"><label class="ml-2">Atuador</label></div>
+                        <div class="flex items-center"><input type="checkbox" name="itens_adicionais" value="Geometria Variável" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue"><label class="ml-2">Geometria Variável</label></div>
+                        <div class="flex items-center"><input type="checkbox" name="itens_adicionais" value="Canote da Geometria" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue"><label class="ml-2">Canote da Geometria</label></div>
+                        <div class="flex items-center"><input type="checkbox" name="itens_adicionais" value="Flange da Geometria" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue"><label class="ml-2">Flange da Geometria</label></div>
+                    </div>
+                </div>
+
+                <!-- Observações -->
+                <div>
+                    <label for="observacoes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
+                    <textarea id="observacoes" name="observacoes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+            </form>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t bg-slate-50 flex justify-end space-x-3 sticky bottom-0">
+                <button type="button" id="cancel-modal-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-150">Cancelar</button>
+                <button type="submit" form="new-os-form" class="bg-brand-blue hover:bg-brand-blue-dark text-white font-medium py-2 px-4 rounded-lg transition duration-150">Criar Entrada</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Inclusão da biblioteca do Supabase via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Lógica de Verificação de Sessão e Logout com JavaScript Puro -->
+    <!-- Lógica de Frontend com JavaScript Puro (Vanilla JS) -->
     <script>
-        // 1. Inicialização do Cliente Supabase
+        // ====================================================================
+        // 1. CONFIGURAÇÃO E INICIALIZAÇÃO
+        // ====================================================================
         const SUPABASE_URL = 'https://zghaqlaqozsskfldgsfe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnaGFxbGFxb3pzc2tmbGRnc2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyMDY1MzQsImV4cCI6MjA4NDc4MjUzNH0.aC2DMOUNhS2uK6KGI5Sf2c2vGhrCKHMnRyZhL3WwSus';
+        const WEBHOOK_GET = 'https://teste.mareflow.com.br/webhook/orders/pending-dispatch';
+        const WEBHOOK_POST = 'https://teste.mareflow.com.br/webhook/orders/new-entry';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Instância do cliente Supabase (Corrigido o erro de redeclaração)
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Elementos DOM
+        const filaContainer = document.getElementById('fila-do-dia-container');
+        const filaCountSpan = document.getElementById('fila-count');
+        const loadingMessage = document.getElementById('loading-message');
+        const modal = document.getElementById('new-os-modal');
+        const form = document.getElementById('new-os-form');
 
-        // 2. Verificação de Sessão (Proteção de Rota)
-        async function checkSessionAndProtectRoute() {
-            // Tenta obter a sessão do usuário
-            const { data: { session }, error } = await supabase.auth.getSession();
+        // ====================================================================
+        // 2. FUNÇÕES AUXILIARES
+        // ====================================================================
 
-            // Se não houver sessão ou houver erro, redireciona para o login
-            if (error || !session) {
-                // Redireciona para o login (assumindo que o index.html é a página de login)
-                window.location.href = '/index.html'; 
+        // Função para obter classes de Badge baseado na Urgência
+        function getUrgencyBadge(urgency) {
+            switch (urgency) {
+                case 'Alta':
+                case 'Urgente':
+                    return 'bg-red-100 text-red-800';
+                case 'Normal':
+                    return 'bg-yellow-100 text-yellow-800';
+                case 'Baixa':
+                    return 'bg-gray-100 text-gray-800';
+                default:
+                    return 'bg-gray-100 text-gray-800';
             }
-            // Se houver sessão, o usuário permanece na página.
         }
 
-        // Executa a verificação assim que a página carregar
-        checkSessionAndProtectRoute();
+        // Função para renderizar um Card de OS
+        function renderOrderCard(order) {
+            const urgencyClass = getUrgencyBadge(order.urgency || 'Normal');
+            
+            return `
+                <div class="bg-white p-4 rounded-lg shadow border border-gray-200 flex justify-between items-center">
+                    <div>
+                        <p class="text-lg font-bold text-gray-800">${order.business_id}</p>
+                        <p class="text-sm text-gray-600">${order.model}</p>
+                        <p class="text-xs text-gray-500 mt-1">Cliente: ${order.client}</p>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <span class="inline-block text-xs font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Aguardando Liberação</span>
+                        <span class="inline-block text-xs font-medium ${urgencyClass} px-2 py-0.5 rounded-full">${order.urgency || 'Normal'}</span>
+                    </div>
+                </div>
+            `;
+        }
 
+        // Função principal para carregar os dados da API
+        async function loadPendingOrders() {
+            filaContainer.innerHTML = '';
+            loadingMessage.classList.remove('hidden');
+            
+            try {
+                const response = await fetch(WEBHOOK_GET, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                });
 
-        // 3. Lógica do Botão de Sair (Logout)
-        const logoutButton = document.getElementById('logout-button');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-        logoutButton.addEventListener('click', async () => {
-            // Chama a função de desautenticação do Supabase
-            const { error } = await supabase.auth.signOut();
+                const orders = await response.json();
+                
+                loadingMessage.classList.add('hidden');
+                
+                if (orders.length === 0) {
+                    filaContainer.innerHTML = '<p class="text-gray-500 text-center mt-8">Nenhuma ordem de serviço pendente na fila.</p>';
+                    filaCountSpan.textContent = '0';
+                    return;
+                }
 
-            if (error) {
-                console.error("Erro ao fazer logout:", error);
-                alert("Erro ao sair da sessão. Tente novamente.");
-            } else {
-                // Redireciona o usuário de volta para a página de login
-                window.location.href = '/index.html';
+                filaCountSpan.textContent = orders.length;
+                orders.forEach(order => {
+                    filaContainer.insertAdjacentHTML('beforeend', renderOrderCard(order));
+                });
+
+            } catch (error) {
+                console.error("Erro ao carregar ordens:", error);
+                loadingMessage.textContent = 'Erro ao carregar a fila. Tente novamente mais tarde.';
+                loadingMessage.classList.remove('hidden');
+                filaCountSpan.textContent = 'ERRO';
             }
+        }
+        
+        // ====================================================================
+        // 3. LÓGICA DE AUTENTICAÇÃO E ROTA
+        // ====================================================================
+
+        // Proteção de Rota e Inicialização dos Dados
+        (async function initDashboard() {
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+
+            // 1. Proteção de Rota
+            if (error || !session) {
+                window.location.href = '/index.html'; 
+                return;
+            }
+
+            // 2. Carregamento Inicial de Dados
+            await loadPendingOrders();
+
+            // 3. Listener de Logout
+            document.getElementById('logout-button').addEventListener('click', async () => {
+                await supabaseClient.auth.signOut();
+                window.location.href = '/index.html';
+            });
+        })();
+
+        // ====================================================================
+        // 4. LÓGICA DO MODAL (NOVA ORDEM)
+        // ====================================================================
+
+        // Ações para Abrir/Fechar Modal
+        document.getElementById('novo-orcamento-btn').addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            form.reset(); // Limpa o formulário ao abrir
+            // Preenche a data de programação com a data de hoje por padrão
+            document.getElementById('data_programacao').valueAsDate = new Date();
+        });
+
+        document.getElementById('close-modal-btn').addEventListener('click', () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        });
+        document.getElementById('cancel-modal-btn').addEventListener('click', () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        });
+
+        // Lógica de Submissão do Formulário (POST para Webhook)
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            // 1. Coletar Dados do Formulário
+            const formData = new FormData(form);
+            const data = {
+                business_id: formData.get('orcamento_entrada_num'),
+                client: formData.get('nome_cliente'),
+                model: formData.get('modelo_turbo'),
+                is_exchange_sale: formData.has('venda_base_troca'),
+                exchange_status: formData.get('base_troca_status') || null,
+                program_date: formData.get('data_programacao'),
+                urgency: formData.get('grau_urgencia'),
+                additional_items: formData.getAll('itens_adicionais'), // Retorna um array
+                observations: formData.get('observacoes'),
+                // Adicione outros campos conforme necessário para o seu backend (Webhook)
+            };
+
+            // 2. Enviar para a Webhook
+            try {
+                const response = await fetch(WEBHOOK_POST, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (response.status === 201 || response.ok) { // Supondo 201 Created ou 200/OK
+                    alert("Ordem de Serviço criada com sucesso!");
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    await loadPendingOrders(); // Recarrega a lista para mostrar a nova OS
+                } else {
+                    const errorData = await response.json();
+                    alert(`Falha ao criar OS: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
+                }
+            } catch (error) {
+                console.error("Erro no envio POST:", error);
+                alert("Erro de conexão ao tentar criar a Ordem de Serviço.");
+            }
+        });
+
+        // ====================================================================
+        // 5. LÓGICA DO BOTÃO DESPACHAR TUDO (Placeholder)
+        // ====================================================================
+        document.getElementById('despachar-tudo-btn').addEventListener('click', () => {
+            alert('Ação "Despachar Tudo para Análise" ainda não implementada. Aqui seria a lógica para mover todas as OS da fila.');
         });
     </script>
 </body>
