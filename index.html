@@ -150,7 +150,7 @@
         </div>
     </div>
     
-    <!-- NOVO MODAL: Confirmação de Sucesso (CUSTOMIZADO TAILWIND) -->
+    <!-- MODAL: Confirmação de Sucesso -->
     <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-[100]">
         <div class="bg-white w-full max-w-sm rounded-xl shadow-2xl p-6 text-center">
             <div class="flex flex-col items-center mb-4">
@@ -184,8 +184,8 @@
         const filaContainer = document.getElementById('fila-do-dia-container');
         const filaCountSpan = document.getElementById('fila-count');
         const loadingMessage = document.getElementById('loading-message');
-        const modal = document.getElementById('new-os-modal'); // Modal de Criação
-        const successModal = document.getElementById('success-modal'); // Modal de Sucesso
+        const modal = document.getElementById('new-os-modal');
+        const successModal = document.getElementById('success-modal');
         const form = document.getElementById('new-os-form');
         const baseTrocaCheck = document.getElementById('venda_base_troca_check');
         const baseTrocaRadiosDiv = document.getElementById('hull-state-options');
@@ -219,8 +219,10 @@
             }
         }
         
+        // CORREÇÃO APLICADA AQUI
         function renderOrderCard(order) {
-            const urgencyClass = getUrgencyBadge(order.urgency || 'Normal');
+            const urgencyText = order.urgency || 'Normal';
+            const urgencyClass = getUrgencyBadge(urgencyText);
             
             return `
                 <div class="bg-white p-4 rounded-lg shadow border border-gray-200 flex justify-between items-center">
@@ -231,7 +233,7 @@
                     </div>
                     <div class="text-right space-y-1">
                         <span class="inline-block text-xs font-medium bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Aguardando Liberação</span>
-                        <span class="inline-block text-xs font-medium ${urgencyClass} px-2 py-0.5 rounded-full">${order.urgency || 'Normal'}</span>
+                        <span class="inline-block text-xs font-medium ${urgencyClass} px-2 py-0.5 rounded-full">${urgencyText}</span>
                     </div>
                 </div>
             `;
@@ -262,9 +264,10 @@
                 filaCountSpan.textContent = orders.length;
                 
                 orders.forEach(order => {
+                    // CORREÇÃO APLICADA AQUI: Usando fallback simples
                     const orderToRender = {
                         business_id: order.business_id || `PRE-${Math.floor(Math.random() * 1000)}`,
-                        model: order.model || 'Modelo Não Informado',
+                        model: order.model || 'Modelo Desconhecido',
                         client: order.client || 'Cliente Desconhecido',
                         urgency: order.urgency || 'Normal'
                     };
@@ -293,7 +296,6 @@
         // 3. LISTENERS E LÓGICA DE CONTROLE
         // ====================================================================
 
-        // Listener do botão OK do modal de sucesso: Recarrega a fila
         successOkBtn.addEventListener('click', async () => {
             successModal.classList.add('hidden');
             successModal.classList.remove('flex');
@@ -301,7 +303,6 @@
             await loadPendingOrders(); 
         });
 
-        // Listeners do Modal de Criação 
         document.getElementById('close-modal-btn').addEventListener('click', closeModal);
         document.getElementById('cancel-modal-btn').addEventListener('click', closeModal);
         document.getElementById('novo-orcamento-btn').addEventListener('click', () => {
@@ -312,12 +313,10 @@
             baseTrocaRadiosDiv.classList.add('hidden'); 
         });
 
-        // Listener Checkbox Venda à Base de Troca
         baseTrocaCheck.addEventListener('change', (event) => {
             baseTrocaRadiosDiv.classList.toggle('hidden', !event.target.checked);
         });
 
-        // Lógica de Submissão do Formulário (INCLUI user_id)
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
             
