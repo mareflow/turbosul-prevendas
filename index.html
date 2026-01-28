@@ -116,11 +116,12 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <!-- ... (Formulário omitido para brevidade, mantido no JS) ... -->
+
             <form id="new-os-form" class="p-6 space-y-6">
                 <div><label for="orcamento_entrada_num" class="block text-sm font-medium text-gray-700 mb-1">Número do Orçamento / Entrada</label><input type="text" id="orcamento_entrada_num" name="orcamento_entrada_num" placeholder="Ex: ORC-100" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="nome_cliente" class="block text-sm font-medium text-gray-700 mb-1">Nome do Cliente</label><input type="text" id="nome_cliente" name="nome_cliente" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="modelo_turbo" class="block text-sm font-medium text-gray-700 mb-1">Modelo do Turbo</label><input type="text" id="modelo_turbo" name="modelo_turbo" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
+
                 <div class="p-4 rounded-lg bg-amber-50 border border-amber-200 space-y-3">
                     <div class="flex items-center">
                         <input type="checkbox" id="venda_base_troca_check" name="venda_base_troca_check" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue">
@@ -132,8 +133,10 @@
                         <div class="flex items-center"><input type="radio" id="pago_incluso" name="base_troca_status" value="Pago/Incluso" class="h-4 w-4 text-gray-600 border-gray-300 focus:ring-gray-600"><label for="pago_incluso" class="ml-2">Pago/Incluso (Seguir Processo)</label></div>
                     </div>
                 </div>
+
                 <div><label for="data_programacao" class="block text-sm font-medium text-gray-700 mb-1">Data de Programação</label><input type="date" id="data_programacao" name="data_programacao" value="" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></div>
                 <div><label for="grau_urgencia" class="block text-sm font-medium text-gray-700 mb-1">Grau de Urgência</label><select id="grau_urgencia" name="grau_urgencia" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"><option value="Baixa">Baixa</option><option value="Normal" selected>Normal</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option></select></div>
+                
                 <div class="p-4 rounded-lg bg-blue-50 border border-blue-200">
                     <p class="text-sm font-medium text-gray-700 mb-3">Itens Adicionais (Check)</p>
                     <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
@@ -143,6 +146,7 @@
                         <div class="flex items-center"><input type="checkbox" name="itens_adicionais" value="Flange da Geometria" class="h-4 w-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue"><label class="ml-2">Flange da Geometria</label></div>
                     </div>
                 </div>
+                
                 <div><label for="observacoes" class="block text-sm font-medium text-gray-700 mb-1">Observações</label><textarea id="observacoes" name="observacoes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea></div>
             </form>
 
@@ -167,7 +171,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3: Detalhes do Processo (Visualização/Leitura) - NOVO MODAL -->
+    <!-- MODAL 3: Detalhes do Processo (Visualização/Leitura) -->
     <div id="details-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
         <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl">
             
@@ -227,6 +231,14 @@
                     </div>
                 </div>
 
+                <!-- Itens Adicionais -->
+                <div class="space-y-2">
+                    <p class="text-gray-500 font-medium">ITENS ADICIONAIS INCLUÍDOS</p>
+                    <ul id="detail-maintenance-extras" class="text-gray-800 list-disc list-inside bg-slate-50 p-3 rounded-lg">
+                        <!-- Itens serão injetados aqui -->
+                    </ul>
+                </div>
+
                 <!-- Observações e Histórico -->
                 <div class="space-y-2">
                     <p class="text-gray-500 font-medium">OBSERVAÇÕES</p>
@@ -259,9 +271,9 @@
         const filaContainer = document.getElementById('fila-do-dia-container');
         const filaCountSpan = document.getElementById('fila-count');
         const loadingMessage = document.getElementById('loading-message');
-        const modal = document.getElementById('new-os-modal'); // Criação
-        const successModal = document.getElementById('success-modal'); // Sucesso
-        const detailsModal = document.getElementById('details-modal'); // Detalhes (NOVO)
+        const modal = document.getElementById('new-os-modal');
+        const successModal = document.getElementById('success-modal');
+        const detailsModal = document.getElementById('details-modal');
         const form = document.getElementById('new-os-form');
         const baseTrocaCheck = document.getElementById('venda_base_troca_check');
         const baseTrocaRadiosDiv = document.getElementById('hull-state-options');
@@ -273,11 +285,19 @@
         // Armazena todos os dados de ordens carregados para acesso rápido no modal de detalhes
         let currentOrders = [];
 
+        // Mapeamento dos nomes das chaves de maintenance_extras para exibição amigável
+        const MAINTENANCE_MAP = {
+            actuator: 'Atuador',
+            geometry: 'Geometria Variável',
+            geometryStem: 'Canote da Geometria',
+            geometryFlange: 'Flange da Geometria'
+        };
+
         // ====================================================================
         // 2. FUNÇÕES AUXILIARES, RECUPERAÇÃO DE UID E CONTROLE DE MODAL
         // ====================================================================
 
-        async function getCurrentUserUID() {
+        async function getCurrentUserUID() { /* ... (Mantido) ... */
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session && session.user) {
@@ -289,17 +309,17 @@
             return FALLBACK_USER_UID;
         }
 
-        function getUrgencyBadge(urgency) {
+        function getUrgencyBadge(urgency) { /* ... (Mantido) ... */
             switch (urgency) {
                 case 'Alta':
-                case 'Urgente': return 'bg-red-500 text-white'; // Ajuste de cor para visualização
+                case 'Urgente': return 'bg-red-500 text-white';
                 case 'Normal': return 'bg-yellow-200 text-yellow-800';
                 case 'Baixa': return 'bg-gray-100 text-gray-800';
                 default: return 'bg-gray-100 text-gray-800';
             }
         }
         
-        function formatDateTime(isoString) {
+        function formatDateTime(isoString) { /* ... (Mantido) ... */
             if (!isoString) return '--';
             try {
                 const date = new Date(isoString);
@@ -309,12 +329,28 @@
                 return isoString;
             }
         }
+
+        // NOVO: Função para formatar os Itens Adicionais
+        function formatMaintenanceExtras(extras) {
+            if (!extras || typeof extras !== 'object') {
+                return '<li>Nenhum item adicional selecionado.</li>';
+            }
+            
+            const selectedItems = Object.keys(extras)
+                .filter(key => extras[key] === true)
+                .map(key => MAINTENANCE_MAP[key] || key); // Mapeia para nome amigável
+                
+            if (selectedItems.length === 0) {
+                return '<li>Nenhum item adicional selecionado.</li>';
+            }
+            
+            return selectedItems.map(item => `<li>${item}</li>`).join('');
+        }
         
-        function renderOrderCard(order) {
+        function renderOrderCard(order) { /* ... (Mantido) ... */
             const urgencyText = order.urgency || 'Normal';
             const urgencyClass = getUrgencyBadge(urgencyText);
             
-            // Adiciona data-id para identificação do clique
             return `
                 <div class="os-card bg-white p-4 rounded-lg shadow border border-gray-200 flex justify-between items-center" data-order-id="${order.id}">
                     <div>
@@ -330,7 +366,7 @@
             `;
         }
 
-        async function loadPendingOrders() {
+        async function loadPendingOrders() { /* ... (Mantido, mas ajustado para mapear corretamente) ... */
             filaContainer.innerHTML = '';
             loadingMessage.classList.remove('hidden');
             
@@ -345,14 +381,33 @@
                 const responseJson = await response.json(); 
                 
                 let orders = responseJson.data; 
-                
                 if (!Array.isArray(orders)) {
                     orders = Array.isArray(responseJson) ? responseJson : [];
                 }
                 
-                // Mapeia e extrai os dados reais antes de armazenar
-                currentOrders = orders.map(rawOrder => rawOrder.json || rawOrder); 
-
+                // Mapeia os dados REAIS para currentOrders, acessando 'json' e garantindo fallbacks
+                currentOrders = orders.map(rawOrder => {
+                    const order = rawOrder.json || rawOrder;
+                    return {
+                        id: order.id, 
+                        business_id: order.business_id || `PRE-${Math.floor(Math.random() * 1000)}`,
+                        model: order.model || 'Modelo Desconhecido',
+                        client: order.client || 'Cliente Desconhecido',
+                        urgency: order.urgency || 'Normal',
+                        status: order.status || 'Aguardando',
+                        difficulty: order.difficulty || 1,
+                        is_trade_in: order.is_trade_in || false,
+                        hull_state: order.hull_state || 'UNKNOWN',
+                        exchange_status: order.exchange_status || null, // Se o n8n passar o status de troca aqui
+                        observation: order.observation || null,
+                        created_at: order.created_at,
+                        // TRATAMENTO DO maintenance_extras (garante que é um objeto mesmo que venha como string/JSON no CSV)
+                        maintenance_extras: (typeof order.maintenance_extras === 'string' && order.maintenance_extras.startsWith('{')) 
+                            ? JSON.parse(order.maintenance_extras) 
+                            : (order.maintenance_extras || {})
+                    };
+                });
+                
                 loadingMessage.classList.add('hidden');
                 
                 if (currentOrders.length === 0) {
@@ -363,19 +418,10 @@
 
                 filaCountSpan.textContent = currentOrders.length;
                 
-                currentOrders.forEach(order => {
-                    // Prepara o objeto para a renderização do card
-                    const orderToRender = {
-                        id: order.id, // ID é necessário para o listener de clique
-                        business_id: order.business_id || `PRE-${Math.floor(Math.random() * 1000)}`,
-                        model: order.model || 'Modelo Desconhecido',
-                        client: order.client || 'Cliente Desconhecido',
-                        urgency: order.urgency || 'Normal'
-                    };
+                currentOrders.forEach(orderToRender => {
                     filaContainer.insertAdjacentHTML('beforeend', renderOrderCard(orderToRender));
                 });
                 
-                // Adiciona listeners de clique após a renderização
                 addCardClickListeners();
 
             } catch (error) {
@@ -386,12 +432,12 @@
             }
         }
         
-        function showSuccessModal() {
+        function showSuccessModal() { /* ... (Mantido) ... */
             successModal.classList.remove('hidden');
             successModal.classList.add('flex');
         }
 
-        function closeModal() {
+        function closeModal() { /* ... (Mantido) ... */
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -401,28 +447,39 @@
             detailsModal.classList.remove('flex');
         }
         
-        // FUNÇÃO DE EXIBIÇÃO DE DETALHES (NOVA)
+        // FUNÇÃO DE EXIBIÇÃO DE DETALHES (ATUALIZADA)
         function showDetailsModal(order) {
             
+            // Determina o texto do TIPO DE VENDA (resolve UNKNOWN)
+            let tradeInText = 'Venda Comum';
+            if (order.is_trade_in) {
+                // Tenta usar o status de troca enviado pelo modal, senão usa o hull_state
+                const hullStateDisplay = order.exchange_status || order.hull_state;
+                tradeInText = `Venda à Base de Troca (${hullStateDisplay || 'Desconhecido'})`;
+            }
+            
             // Preenche os campos principais
-            document.getElementById('detail-business-id').textContent = order.business_id || '--';
-            document.getElementById('detail-model').textContent = order.model || '--';
-            document.getElementById('detail-client').textContent = order.client || '--';
+            document.getElementById('detail-business-id').textContent = order.business_id;
+            document.getElementById('detail-model').textContent = order.model;
+            document.getElementById('detail-client').textContent = order.client;
             
             // Status e Urgência
-            const urgencyText = order.urgency || 'Normal';
+            const urgencyText = order.urgency;
             const urgencyBadge = document.getElementById('detail-urgency');
             urgencyBadge.textContent = urgencyText;
             urgencyBadge.className = 'inline-block text-sm font-medium px-2 py-0.5 rounded-full ' + getUrgencyBadge(urgencyText);
             
-            document.getElementById('detail-status').textContent = order.status || 'Não Iniciado';
+            document.getElementById('detail-status').textContent = order.status;
             
             // Datas
             document.getElementById('detail-created-at').textContent = formatDateTime(order.created_at);
             
             // Detalhes Adicionais
-            document.getElementById('detail-difficulty').textContent = order.difficulty || 'Não Avaliado';
-            document.getElementById('detail-trade-in').textContent = order.is_trade_in ? `Venda à Base de Troca (${order.hull_state || 'Pendente'})` : 'Venda Comum';
+            document.getElementById('detail-difficulty').textContent = order.difficulty;
+            document.getElementById('detail-trade-in').textContent = tradeInText; // CORRIGIDO AQUI
+
+            // Itens Adicionais (NOVO)
+            document.getElementById('detail-maintenance-extras').innerHTML = formatMaintenanceExtras(order.maintenance_extras);
 
             // Observações
             document.getElementById('detail-observation').textContent = order.observation || 'Nenhuma observação registrada.';
@@ -440,6 +497,7 @@
             document.querySelectorAll('.os-card').forEach(card => {
                 card.addEventListener('click', (event) => {
                     const orderId = event.currentTarget.dataset.orderId;
+                    // Busca os dados completos da ordem salva em currentOrders
                     const orderData = currentOrders.find(o => o.id === orderId);
                     
                     if (orderData) {
@@ -451,7 +509,10 @@
             });
         }
         
-        // Listener do botão OK do modal de sucesso
+        // Listener para fechar o modal de detalhes
+        closeDetailsBtn.addEventListener('click', closeDetailsModal);
+
+        // ... (Outros Listeners mantidos) ...
         successOkBtn.addEventListener('click', async () => {
             successModal.classList.add('hidden');
             successModal.classList.remove('flex');
@@ -459,10 +520,6 @@
             await loadPendingOrders(); 
         });
 
-        // Listener para fechar o modal de detalhes
-        closeDetailsBtn.addEventListener('click', closeDetailsModal);
-
-        // Listeners dos Modais de Criação (Mantidos)
         document.getElementById('close-modal-btn').addEventListener('click', closeModal);
         document.getElementById('cancel-modal-btn').addEventListener('click', closeModal);
         document.getElementById('novo-orcamento-btn').addEventListener('click', () => {
