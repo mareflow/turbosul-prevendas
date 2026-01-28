@@ -246,19 +246,27 @@
                 const response = await fetch(WEBHOOK_GET, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
                 if (!response.ok) {
-                    // Tenta ler o erro do backend se houver falha HTTP
                     const errorText = await response.text();
                     throw new Error(`Falha HTTP (Status: ${response.status}). Resposta: ${errorText.substring(0, 50)}...`);
                 }
 
-                const orders = await response.json(); 
+                const responseJson = await response.json(); 
                 
-                // >>>>> ADIÇÃO CRÍTICA PARA DEBUGGING: Verifique o console <<<<<
-                console.log("Resposta JSON completa recebida:", orders);
+                // >>> DIAGNÓSTICO: A imagem mostra que o array está encapsulado em 'data'.
+                // CORREÇÃO: Tenta pegar o array da propriedade 'data' e, se não for um array, assume que está vazio.
+                let orders = responseJson.data; 
+                
+                if (!Array.isArray(orders)) {
+                    orders = [];
+                }
+                
+                // >>> MANTIDO PARA DEBUGGING: VAI CONFIRMAR QUE 'orders' AGORA É O ARRAY CORRETO
+                console.log("Resposta JSON completa recebida:", responseJson);
+                console.log("Array de ordens final (orders):", orders);
                 
                 loadingMessage.classList.add('hidden');
                 
-                if (!Array.isArray(orders) || orders.length === 0) {
+                if (orders.length === 0) {
                     filaContainer.innerHTML = '<p class="text-gray-500 text-center mt-8">Nenhuma ordem de serviço pendente na fila.</p>';
                     filaCountSpan.textContent = '0';
                     return;
@@ -267,7 +275,6 @@
                 filaCountSpan.textContent = orders.length;
                 
                 orders.forEach(order => {
-                    // Usando fallbacks simples
                     const orderToRender = {
                         business_id: order.business_id || `PRE-${Math.floor(Math.random() * 1000)}`,
                         model: order.model || 'Modelo Desconhecido',
