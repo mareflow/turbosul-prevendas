@@ -236,6 +236,7 @@
         
         const WEBHOOK_GET = 'https://teste.mareflow.com.br/webhook/orders/pending-dispatch';
         const WEBHOOK_POST = 'https://teste.mareflow.com.br/webhook/orders/new-entry';
+        const WEBHOOK_DISPATCH = 'https://teste.mareflow.com.br/webhook/orders/dispatch-to-analysis'; // Nova URL de Despacho
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
@@ -251,6 +252,7 @@
         const baseTrocaRadiosDiv = document.getElementById('hull-state-options');
         const successOkBtn = document.getElementById('success-modal-ok-btn');
         const closeDetailsBtn = document.getElementById('close-details-modal-btn');
+        const dispatchAllBtn = document.getElementById('despachar-tudo-btn'); // Botão de Despacho
         
         const FALLBACK_USER_UID = '8ab0d7ed-055c-4480-a1af-eb0b08894682';
 
@@ -263,7 +265,7 @@
             geometryFlange: 'Flange da Geometria'
         };
 
-        // NOVO: Mapeamento do código do Supabase/Enum para texto amigável
+        // Mapeamento do código do Supabase/Enum para texto amigável
         const HULL_STATE_MAP = {
             'RECEIVED': 'Já Recebido (Seguir Processo)',
             'WAITING': 'Aguardando Cliente Trazer (Standby)',
@@ -376,19 +378,19 @@
                     };
                 });
                 
-                // >>>>> PONTO DE DEBUG CRÍTICO: Verifique este log no console <<<<<
-                console.log("Array de ordens (currentOrders):", currentOrders);
-
-
+                console.log("Array de ordens (currentOrders):", currentOrders); // Log de debug
+                
                 loadingMessage.classList.add('hidden');
                 
                 if (currentOrders.length === 0) {
                     filaContainer.innerHTML = '<p class="text-gray-500 text-center mt-8">Nenhuma ordem de serviço pendente na fila.</p>';
                     filaCountSpan.textContent = '0';
+                    dispatchAllBtn.disabled = true; // Desabilita se não há itens
                     return;
                 }
 
                 filaCountSpan.textContent = currentOrders.length;
+                dispatchAllBtn.disabled = false;
                 
                 currentOrders.forEach(orderToRender => {
                     filaContainer.insertAdjacentHTML('beforeend', renderOrderCard(orderToRender));
@@ -401,12 +403,13 @@
                 loadingMessage.textContent = `Erro ao carregar a fila. ${error.message}.`;
                 loadingMessage.classList.remove('hidden');
                 filaCountSpan.textContent = 'ERRO';
+                dispatchAllBtn.disabled = true;
             }
         }
         
         function showDetailsModal(order) {
             
-            // --- TRATAMENTO DO TIPO DE VENDA (PRIORIZA HULL_STATE MAIS LEGÍVEL) ---
+            // --- TRATAMENTO DO TIPO DE VENDA (PRIORIZA HULL_STATE DO BANCO) ---
             let tradeInText = 'Venda Comum';
             if (order.is_trade_in) {
                 // 1. Tenta traduzir o Hull State (RECEIVED, WAITING, PAID)
@@ -444,8 +447,82 @@
             detailsModal.classList.add('flex');
         }
 
+        function showSuccessModal() {
+            successModal.classList.remove('hidden');
+            successModal.classList.add('flex');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeDetailsModal() {
+            detailsModal.classList.add('hidden');
+            detailsModal.classList.remove('flex');
+        }
+        
+        /**
+         * Envia todas as ordens na fila para o Webhook de Despacho.
+         */
+        async function dispatchAllOrders() {
+            if (currentOrders.length === 0) {
+                alert("Nenhuma ordem para despachar.");
+                return;
+            }
+
+            if (!confirm(`Tem certeza que deseja despachar ${currentOrders.length} ordens para Análise Técnica?`)) {
+                return;
+            }
+
+            const userId = await getCurrentUserUID();
+            const osIds = currentOrders.map(order => order.id);
+
+            // Lista de Promises de despacho
+            const dispatchPromises = osIds.map(id => {
+                const payload = { id: id, user_id: userId };
+                
+                return fetch(WEBHOOK_DISPATCH, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                }).then(response => {
+                    if (!response.ok) {
+                        return response.json().then(error => {
+                            throw new Error(`Falha ao despachar OS ${id}: ${error.message || response.statusText}`);
+                        }).catch(() => {
+                             throw new Error(`Falha na rede ao despachar OS ${id}.`);
+                        });
+                    }
+                    return response.json();
+                });
+            });
+
+            // Executa todas as promises
+            try {
+                // Bloqueia a interface enquanto espera todas as requisições
+                dispatchAllBtn.disabled = true;
+                dispatchAllBtn.textContent = 'Despachando...';
+                
+                await Promise.all(dispatchPromises);
+                
+                alert(`Sucesso! ${osIds.length} ordens despachadas para Análise Técnica.`);
+                
+                // Recarrega a fila para mostrar que os itens sumiram
+                await loadPendingOrders();
+
+            } catch (error) {
+                console.error("Erro no Despacho:", error);
+                alert(`Erro ao despachar ordens. Detalhe: ${error.message}`);
+            } finally {
+                dispatchAllBtn.textContent = `Despachar Tudo para Análise (${currentOrders.length})`;
+                dispatchAllBtn.disabled = false;
+            }
+        }
+
+
         // ====================================================================
-        // 3. LISTENERS E LÓGICA DE CONTROLE
+        // 4. INICIALIZAÇÃO DOS LISTENERS
         // ====================================================================
 
         function addCardClickListeners() {
@@ -463,21 +540,7 @@
             });
         }
         
-        function showSuccessModal() {
-            successModal.classList.remove('hidden');
-            successModal.classList.add('flex');
-        }
-
-        function closeModal() {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function closeDetailsModal() {
-            detailsModal.classList.add('hidden');
-            detailsModal.classList.remove('flex');
-        }
-        
+        // Listener do botão OK do modal de sucesso
         successOkBtn.addEventListener('click', async () => {
             successModal.classList.add('hidden');
             successModal.classList.remove('flex');
@@ -485,8 +548,14 @@
             await loadPendingOrders(); 
         });
 
+        // Listener do botão Despachar Tudo
+        dispatchAllBtn.addEventListener('click', dispatchAllOrders); 
+
+
+        // Listener para fechar o modal de detalhes
         closeDetailsBtn.addEventListener('click', closeDetailsModal);
 
+        // Listeners dos Modais de Criação 
         document.getElementById('close-modal-btn').addEventListener('click', closeModal);
         document.getElementById('cancel-modal-btn').addEventListener('click', closeModal);
         document.getElementById('novo-orcamento-btn').addEventListener('click', () => {
@@ -555,10 +624,6 @@
                 window.location.href = '/index.html';
             });
         })();
-
-        document.getElementById('despachar-tudo-btn').addEventListener('click', () => {
-            alert('Ação "Despachar Tudo para Análise" ainda não implementada.');
-        });
     </script>
 </body>
 </html>
