@@ -101,7 +101,8 @@
         </div>
     </main>
 
-    <!-- MODAL 1: Abertura de Entrada / Orçamento (Criação) -->
+    <!-- MODAIS (Criação, Sucesso, Detalhes, Confirmação) - Não alterados na estrutura HTML -->
+    <!-- ... (Modal 1: Criação) -->
     <div id="new-os-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
         <div class="bg-white w-full max-w-xl rounded-xl shadow-2xl transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto">
             
@@ -165,8 +166,8 @@
             </button>
         </div>
     </div>
-    
-    <!-- MODAL 4: Sucesso no Despacho (NOVO) -->
+
+    <!-- MODAL 4: Sucesso no Despacho -->
     <div id="dispatch-success-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-[100]">
         <div class="bg-white w-full max-w-sm rounded-xl shadow-2xl p-6 text-center">
             <div class="flex flex-col items-center mb-4">
@@ -262,9 +263,9 @@
         const successModal = document.getElementById('success-modal');
         const detailsModal = document.getElementById('details-modal');
         const confirmDispatchModal = document.getElementById('confirm-dispatch-modal');
-        const dispatchSuccessModal = document.getElementById('dispatch-success-modal'); // NOVO
+        const dispatchSuccessModal = document.getElementById('dispatch-success-modal');
         const confirmDispatchMessage = document.getElementById('confirm-dispatch-message');
-        const dispatchSuccessMessage = document.getElementById('dispatch-success-message'); // NOVO
+        const dispatchSuccessMessage = document.getElementById('dispatch-success-message');
         const form = document.getElementById('new-os-form');
         const baseTrocaCheck = document.getElementById('venda_base_troca_check');
         const baseTrocaRadiosDiv = document.getElementById('hull-state-options');
@@ -273,7 +274,7 @@
         const dispatchAllBtn = document.getElementById('despachar-tudo-btn');
         const confirmDispatchBtn = document.getElementById('confirm-dispatch-btn');
         const cancelDispatchBtn = document.getElementById('cancel-dispatch-btn');
-        const dispatchSuccessOkBtn = document.getElementById('dispatch-success-ok-btn'); // NOVO
+        const dispatchSuccessOkBtn = document.getElementById('dispatch-success-ok-btn');
         
         const FALLBACK_USER_UID = '8ab0d7ed-055c-4480-a1af-eb0b08894682';
 
@@ -372,7 +373,7 @@
                     throw new Error(`Falha HTTP (Status: ${response.status}). Resposta: ${errorText.substring(0, 50)}...`);
                 }
 
-                // CORREÇÃO DE ESTABILIDADE: Lendo como texto e parseando somente se houver conteúdo
+                // CORREÇÃO DE ESTABILIDADE (Robustez contra JSON vazio)
                 const text = await response.text();
                 let responseJson = {};
                 if (text) {
@@ -380,10 +381,10 @@
                         responseJson = JSON.parse(text);
                     } catch (e) {
                         console.warn("Resposta não é JSON válida (mas HTTP OK). Assumindo fila vazia.", e);
-                        responseJson = { data: [] }; // Assume array vazio para evitar quebra
+                        responseJson = { data: [] };
                     }
                 } else {
-                    responseJson = { data: [] }; // Resposta nula/vazia
+                    responseJson = { data: [] };
                 }
                 
                 let orders = responseJson.data; 
@@ -531,24 +532,22 @@
             });
 
             try {
-                // Bloqueia a interface
                 dispatchAllBtn.disabled = true;
                 dispatchAllBtn.textContent = 'Despachando...';
                 
                 await Promise.all(dispatchPromises);
                 
-                // >>> SUBSTITUIÇÃO DO ALERT NATIVO PELO MODAL CUSTOMIZADO
+                // >>> USO DO MODAL CUSTOMIZADO DE SUCESSO (UX melhorada)
                 showDispatchSuccessModal(osIds.length); 
-                
-                // Recarrega a fila. O modal de sucesso customizado (dispatchSuccessOkBtn) chamará a recarga.
 
             } catch (error) {
                 console.error("Erro no Despacho:", error);
                 alert(`Erro ao despachar ordens. Detalhe: ${error.message}`);
             } finally {
-                // Retornamos ao estado normal, mas loadPendingOrders fará a recarga
-                dispatchAllBtn.textContent = `Despachar Tudo para Análise (${currentOrders.length})`;
-                dispatchAllBtn.disabled = false;
+                if (dispatchAllBtn.textContent === 'Despachando...') {
+                    dispatchAllBtn.textContent = `Despachar Tudo para Análise (${currentOrders.length})`;
+                    dispatchAllBtn.disabled = false;
+                }
             }
         }
 
