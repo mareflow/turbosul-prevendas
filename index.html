@@ -101,8 +101,7 @@
         </div>
     </main>
 
-    <!-- MODAIS (Criação, Sucesso, Detalhes, Confirmação) - Não alterados na estrutura HTML -->
-    <!-- ... (Modal 1: Criação) -->
+    <!-- MODAL 1: Abertura de Entrada / Orçamento (Criação) -->
     <div id="new-os-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
         <div class="bg-white w-full max-w-xl rounded-xl shadow-2xl transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto">
             
@@ -255,7 +254,7 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // Elementos DOM
+        // Elementos DOM (Declarados para evitar 'null' no escopo global)
         const filaContainer = document.getElementById('fila-do-dia-container');
         const filaCountSpan = document.getElementById('fila-count');
         const loadingMessage = document.getElementById('loading-message');
@@ -327,17 +326,13 @@
         }
 
         function formatMaintenanceExtras(extras) {
-            if (!extras || typeof extras !== 'object') {
-                return '<li>Nenhum item adicional selecionado.</li>';
-            }
+            if (!extras || typeof extras !== 'object') { return '<li>Nenhum item adicional selecionado.</li>'; }
             
             const selectedItems = Object.keys(extras)
                 .filter(key => extras[key] === true)
                 .map(key => MAINTENANCE_MAP[key] || key);
                 
-            if (selectedItems.length === 0) {
-                return '<li>Nenhum item adicional selecionado.</li>';
-            }
+            if (selectedItems.length === 0) { return '<li>Nenhum item adicional selecionado.</li>'; }
             
             return selectedItems.map(item => `<li>${item}</li>`).join('');
         }
@@ -373,7 +368,7 @@
                     throw new Error(`Falha HTTP (Status: ${response.status}). Resposta: ${errorText.substring(0, 50)}...`);
                 }
 
-                // CORREÇÃO DE ESTABILIDADE (Robustez contra JSON vazio)
+                // CORREÇÃO DE ESTABILIDADE: Lendo como texto e parseando somente se houver conteúdo
                 const text = await response.text();
                 let responseJson = {};
                 if (text) {
@@ -506,9 +501,6 @@
             dispatchSuccessModal.classList.remove('flex');
         }
         
-        /**
-         * Envia todas as ordens na fila para o Webhook de Despacho.
-         */
         async function dispatchAllOrders(osIds) {
             const userId = await getCurrentUserUID();
             
@@ -537,7 +529,6 @@
                 
                 await Promise.all(dispatchPromises);
                 
-                // >>> USO DO MODAL CUSTOMIZADO DE SUCESSO (UX melhorada)
                 showDispatchSuccessModal(osIds.length); 
 
             } catch (error) {
@@ -553,7 +544,7 @@
 
 
         // ====================================================================
-        // 4. INICIALIZAÇÃO DOS LISTENERS
+        // 4. INICIALIZAÇÃO DOS LISTENERS (Encapsulados em DOMContentLoaded)
         // ====================================================================
 
         function addCardClickListeners() {
@@ -571,116 +562,123 @@
             });
         }
         
-        // Listener do modal de sucesso de CRIAÇÃO
-        successOkBtn.addEventListener('click', async () => {
-            successModal.classList.add('hidden');
-            successModal.classList.remove('flex');
-            closeModal(); 
-            await loadPendingOrders(); 
-        });
-        
-        // Listener do modal de sucesso de DESPACHO (Fecha e recarrega)
-        dispatchSuccessOkBtn.addEventListener('click', async () => {
-            closeDispatchSuccessModal();
-            await loadPendingOrders(); 
-        });
+        // ANEXANDO TODOS OS LISTENERS DE DOM AQUI DENTRO
+        document.addEventListener('DOMContentLoaded', () => {
 
-
-        // Listener do botão Despachar Tudo (Abre o modal de confirmação customizado)
-        dispatchAllBtn.addEventListener('click', () => {
-            if (currentOrders.length === 0) {
-                alert("Nenhuma ordem para despachar.");
-                return;
-            }
-            const count = currentOrders.length;
-            confirmDispatchMessage.textContent = `Tem certeza que deseja despachar ${count} ${count > 1 ? 'ordens' : 'ordem'} para Análise Técnica?`;
-            confirmDispatchModal.classList.remove('hidden');
-            confirmDispatchModal.classList.add('flex');
-        });
-
-        // Ação de Confirmação no Modal Customizado
-        confirmDispatchBtn.addEventListener('click', async () => {
-            closeConfirmDispatchModal();
-            const osIds = currentOrders.map(order => order.id);
-            await dispatchAllOrders(osIds);
-        });
-
-        // Ação de Cancelamento no Modal Customizado
-        cancelDispatchBtn.addEventListener('click', closeConfirmDispatchModal);
-
-
-        // Listener para fechar o modal de detalhes
-        closeDetailsBtn.addEventListener('click', closeDetailsModal);
-
-        // Listeners dos Modais de Criação 
-        document.getElementById('close-modal-btn').addEventListener('click', closeModal);
-        document.getElementById('cancel-modal-btn').addEventListener('click', closeModal);
-        document.getElementById('novo-orcamento-btn').addEventListener('click', () => {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            form.reset(); 
-            document.getElementById('data_programacao').valueAsDate = new Date();
-            baseTrocaRadiosDiv.classList.add('hidden'); 
-        });
-
-        baseTrocaCheck.addEventListener('change', (event) => {
-            baseTrocaRadiosDiv.classList.toggle('hidden', !event.target.checked);
-        });
-
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            
-            const userId = await getCurrentUserUID(); 
-
-            const formData = new FormData(form);
-            const data = {
-                user_id: userId, 
-                business_id: formData.get('orcamento_entrada_num'),
-                client: formData.get('nome_cliente'),
-                model: formData.get('modelo_turbo'),
-                is_exchange_sale: formData.has('venda_base_troca_check'),
-                exchange_status: formData.has('venda_base_troca_check') ? (formData.get('base_troca_status') || 'Não Selecionado') : null,
-                program_date: formData.get('data_programacao'),
-                urgency: formData.get('grau_urgencia'),
-                additional_items: formData.getAll('itens_adicionais'), 
-                observations: formData.get('observacoes'),
-            };
-
-            try {
-                const response = await fetch(WEBHOOK_POST, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                });
-
-                if (response.status === 201 || response.ok) { 
-                    closeModal(); 
-                    showSuccessModal(); 
-                } else {
-                    const errorData = await response.json().catch(() => ({ message: 'Sem detalhes de erro no corpo.' }));
-                    alert(`Falha ao criar OS: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
-                }
-            } catch (error) {
-                console.error("Erro no envio POST:", error);
-                alert("Erro de conexão ao tentar criar a Ordem de Serviço.");
-            }
-        });
-        
-        (async function initDashboard() {
-            const { data: { session }, error } = await supabaseClient.auth.getSession();
-
-            if (error || !session) {
-                window.location.href = '/index.html'; 
-                return;
-            }
-
-            await loadPendingOrders();
-
+            // Listener de Logout
             document.getElementById('logout-button').addEventListener('click', async () => {
                 await supabaseClient.auth.signOut();
                 window.location.href = '/index.html';
             });
-        })();
+            
+            // Listener do modal de sucesso de CRIAÇÃO
+            successOkBtn.addEventListener('click', async () => {
+                successModal.classList.add('hidden');
+                successModal.classList.remove('flex');
+                closeModal(); 
+                await loadPendingOrders(); 
+            });
+            
+            // Listener do modal de sucesso de DESPACHO (Fecha e recarrega)
+            dispatchSuccessOkBtn.addEventListener('click', async () => {
+                closeDispatchSuccessModal();
+                await loadPendingOrders(); 
+            });
+
+
+            // Listener do botão Despachar Tudo (Abre o modal de confirmação customizado)
+            dispatchAllBtn.addEventListener('click', () => {
+                if (currentOrders.length === 0) {
+                    alert("Nenhuma ordem para despachar.");
+                    return;
+                }
+                const count = currentOrders.length;
+                confirmDispatchMessage.textContent = `Tem certeza que deseja despachar ${count} ${count > 1 ? 'ordens' : 'ordem'} para Análise Técnica?`;
+                confirmDispatchModal.classList.remove('hidden');
+                confirmDispatchModal.classList.add('flex');
+            });
+
+            // Ação de Confirmação no Modal Customizado
+            confirmDispatchBtn.addEventListener('click', async () => {
+                closeConfirmDispatchModal();
+                const osIds = currentOrders.map(order => order.id);
+                await dispatchAllOrders(osIds);
+            });
+
+            // Ação de Cancelamento no Modal Customizado
+            cancelDispatchBtn.addEventListener('click', closeConfirmDispatchModal);
+
+
+            // Listener para fechar o modal de detalhes
+            closeDetailsBtn.addEventListener('click', closeDetailsModal);
+
+            // Listeners dos Modais de Criação 
+            document.getElementById('close-modal-btn').addEventListener('click', closeModal);
+            document.getElementById('cancel-modal-btn').addEventListener('click', closeModal);
+            document.getElementById('novo-orcamento-btn').addEventListener('click', () => {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                form.reset(); 
+                document.getElementById('data_programacao').valueAsDate = new Date();
+                baseTrocaRadiosDiv.classList.add('hidden'); 
+            });
+
+            baseTrocaCheck.addEventListener('change', (event) => {
+                baseTrocaRadiosDiv.classList.toggle('hidden', !event.target.checked);
+            });
+
+            // Listener de Submissão do Formulário (POST)
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                const userId = await getCurrentUserUID(); 
+
+                const formData = new FormData(form);
+                const data = {
+                    user_id: userId, 
+                    business_id: formData.get('orcamento_entrada_num'),
+                    client: formData.get('nome_cliente'),
+                    model: formData.get('modelo_turbo'),
+                    is_exchange_sale: formData.has('venda_base_troca_check'),
+                    exchange_status: formData.has('venda_base_troca_check') ? (formData.get('base_troca_status') || 'Não Selecionado') : null,
+                    program_date: formData.get('data_programacao'),
+                    urgency: formData.get('grau_urgencia'),
+                    additional_items: formData.getAll('itens_adicionais'), 
+                    observations: formData.get('observacoes'),
+                };
+
+                try {
+                    const response = await fetch(WEBHOOK_POST, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data),
+                    });
+
+                    if (response.status === 201 || response.ok) { 
+                        closeModal(); 
+                        showSuccessModal(); 
+                    } else {
+                        const errorData = await response.json().catch(() => ({ message: 'Sem detalhes de erro no corpo.' }));
+                        alert(`Falha ao criar OS: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
+                    }
+                } catch (error) {
+                    console.error("Erro no envio POST:", error);
+                    alert("Erro de conexão ao tentar criar a Ordem de Serviço.");
+                }
+            });
+
+            // Chama a inicialização da dashboard e proteção de rota
+            (async function initDashboard() {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+
+                if (error || !session) {
+                    window.location.href = '/index.html'; 
+                    return;
+                }
+
+                await loadPendingOrders();
+            })();
+        }); // FIM DO DOMContentLoaded
     </script>
 </body>
 </html>
