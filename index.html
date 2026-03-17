@@ -672,8 +672,8 @@
                 };
 
                 try {
-                    // Alteração da URL para o endpoint de produção/despacho
-                    const response = await fetch('https://teste.mareflow.com.br/webhook/production/presales-dispatch', {
+                    // Chamada para o Webhook de CRIAR NOVA OS (Mantém em Aguardando Liberação)
+                    const response = await fetch('https://teste.mareflow.com.br/webhook/orders/new-entry', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data),
