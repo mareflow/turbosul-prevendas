@@ -91,11 +91,11 @@
 
             <div class="lg:w-2/5">
                 <div class="bg-blue-100 p-4 rounded-lg shadow-sm border border-blue-200 mb-4">
-                    <h3 class="text-lg font-semibold text-blue-700">Programação Futura (Aguardando Data)</h3>
+                    <h3 class="text-lg font-semibold text-blue-700 uppercase font-black text-sm tracking-widest">Programação Futura</h3>
                 </div>
                 
-                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 text-center">
-                    <p class="text-gray-500 italic">Nenhuma programação futura.</p>
+                <div id="fila-futura-container" class="space-y-4">
+                    <p class="text-gray-400 italic text-center py-10 bg-white rounded-lg border border-dashed text-xs">Nenhuma programação futura.</p>
                 </div>
             </div>
         </div>
@@ -379,84 +379,70 @@
             `;
         }
 
-        async function loadPendingOrders() { 
+async function loadPendingOrders() { 
             filaContainer.innerHTML = '';
+            const futuraContainer = document.getElementById('fila-futura-container');
+            futuraContainer.innerHTML = '';
             loadingMessage.classList.remove('hidden');
             
             try {
                 const response = await fetch(WEBHOOK_GET, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Falha HTTP (Status: ${response.status}). Resposta: ${errorText.substring(0, 50)}...`);
-                }
-
-                // CORREÇÃO DE ESTABILIDADE: Lendo como texto e parseando somente se houver conteúdo
                 const text = await response.text();
-                let responseJson = {};
-                if (text) {
-                    try {
-                        responseJson = JSON.parse(text);
-                    } catch (e) {
-                        console.warn("Resposta não é JSON válida (mas HTTP OK). Assumindo fila vazia.", e);
-                        responseJson = { data: [] };
-                    }
-                } else {
-                    responseJson = { data: [] };
-                }
+                let responseJson = text ? JSON.parse(text) : { data: [] };
+                let orders = responseJson.data || responseJson;
+                if (!Array.isArray(orders)) orders = [];
                 
-                let orders = responseJson.data; 
-                if (!Array.isArray(orders)) { orders = Array.isArray(responseJson) ? responseJson : []; }
-                
+                // 1. Normalização dos dados
                 currentOrders = orders.map(rawOrder => {
-                    const order = rawOrder.json || rawOrder;
-                    return {
-                        id: order.id, 
-                        business_id: order.business_id || `PRE-${Math.floor(Math.random() * 1000)}`,
-                        model: order.model || 'Modelo Desconhecido',
-                        client: order.client || 'Cliente Desconhecido',
-                        urgency: order.urgency || 'Normal',
-                        status: order.status || 'Aguardando',
-                        difficulty: order.difficulty || 1,
-                        is_trade_in: order.is_trade_in || false,
-                        hull_state: order.hull_state || 'UNKNOWN',
-                        exchange_status: order.exchange_status || null, 
-                        observation: order.observation || null,
-                        created_at: order.created_at,
-                        maintenance_extras: (typeof order.maintenance_extras === 'string' && order.maintenance_extras.startsWith('{')) 
-                            ? JSON.parse(order.maintenance_extras) 
-                            : (order.maintenance_extras || {})
-                    };
+                    const o = rawOrder.json || rawOrder;
+                    return { ...o, maintenance_extras: typeof o.maintenance_extras === 'string' ? JSON.parse(o.maintenance_extras) : o.maintenance_extras };
                 });
-                
+
+                // 2. Lógica de Data (HOJE vs FUTURO)
+                const hoje = new Date();
+                hoje.setHours(0, 0, 0, 0);
+
+                const filaDoDia = [];
+                const filaFutura = [];
+
+                currentOrders.forEach(order => {
+                    const dataOS = new Date(order.scheduled_date || order.created_at);
+                    dataOS.setHours(0, 0, 0, 0);
+
+                    if (dataOS > hoje) {
+                        filaFutura.push(order);
+                    } else {
+                        filaDoDia.push(order);
+                    }
+                });
+
                 loadingMessage.classList.add('hidden');
-                
-                if (currentOrders.length === 0) {
-                    filaContainer.innerHTML = '<p class="text-gray-500 text-center mt-8">Nenhuma ordem de serviço pendente na fila.</p>';
+
+                // 3. Renderizar Fila do Dia (Esquerda)
+                if (filaDoDia.length === 0) {
+                    filaContainer.innerHTML = '<p class="text-gray-400 text-center py-10 bg-white rounded-lg border border-dashed text-xs uppercase font-bold">Fila do dia vazia.</p>';
                     filaCountSpan.textContent = '0';
-                    dispatchAllBtn.disabled = true; 
-                    return;
+                    dispatchAllBtn.disabled = true;
+                } else {
+                    filaCountSpan.textContent = filaDoDia.length;
+                    dispatchAllBtn.disabled = false;
+                    filaDoDia.forEach(o => filaContainer.insertAdjacentHTML('beforeend', renderOrderCard(o)));
                 }
 
-                filaCountSpan.textContent = currentOrders.length;
-                dispatchAllBtn.disabled = false;
+                // 4. Renderizar Programação Futura (Direita)
+                if (filaFutura.length === 0) {
+                    futuraContainer.innerHTML = '<p class="text-gray-400 text-center py-10 bg-white rounded-lg border border-dashed text-xs uppercase font-bold">Nenhuma programação futura.</p>';
+                } else {
+                    filaFutura.forEach(o => futuraContainer.insertAdjacentHTML('beforeend', renderOrderCard(o)));
+                }
                 
-                currentOrders.forEach(orderToRender => {
-                    filaContainer.insertAdjacentHTML('beforeend', renderOrderCard(orderToRender));
-                });
-                
-                // CRÍTICO: Chamar listeners de card APÓS a renderização
                 addCardClickListeners();
 
             } catch (error) {
                 console.error("Erro ao carregar ordens:", error);
-                loadingMessage.textContent = `Erro ao carregar a fila. ${error.message}.`;
-                loadingMessage.classList.remove('hidden');
-                filaCountSpan.textContent = 'ERRO';
-                dispatchAllBtn.disabled = true;
+                loadingMessage.textContent = "Erro na conexão.";
             }
         }
-        
         function showDetailsModal(order) {
             
             let tradeInText = 'Venda Comum';
@@ -624,8 +610,17 @@
             // Ação de Confirmação no Modal Customizado
             confirmDispatchBtn.addEventListener('click', async () => {
                 closeConfirmDispatchModal();
-                const osIds = currentOrders.map(order => order.id);
-                await dispatchAllOrders(osIds);
+                // Filtra apenas as ordens que são para hoje ou passado para despachar
+                const hoje = new Date(); hoje.setHours(0,0,0,0);
+                const osIdsParaDespacho = currentOrders
+                    .filter(o => new Date(o.scheduled_date || o.created_at).setHours(0,0,0,0) <= hoje.getTime())
+                    .map(o => o.id);
+
+                if (osIdsParaDespacho.length > 0) {
+                    await dispatchAllOrders(osIdsParaDespacho);
+                } else {
+                    alert("Não há ordens de HOJE para despachar.");
+                }
             });
 
             // Ação de Cancelamento no Modal Customizado
