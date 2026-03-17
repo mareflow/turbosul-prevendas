@@ -89,11 +89,10 @@
                 </div>
             </div>
 
-            <div class="lg:w-2/5">
+<div class="lg:w-2/5">
                 <div class="bg-blue-100 p-4 rounded-lg shadow-sm border border-blue-200 mb-4">
                     <h3 class="text-lg font-semibold text-blue-700 uppercase font-black text-sm tracking-widest">Programação Futura</h3>
                 </div>
-                
                 <div id="fila-futura-container" class="space-y-4">
                     <p class="text-gray-400 italic text-center py-10 bg-white rounded-lg border border-dashed text-xs">Nenhuma programação futura.</p>
                 </div>
@@ -384,7 +383,7 @@ function renderOrderCard(order) {
 async function loadPendingOrders() { 
             filaContainer.innerHTML = '';
             const futuraContainer = document.getElementById('fila-futura-container');
-            futuraContainer.innerHTML = '';
+            if (futuraContainer) futuraContainer.innerHTML = '';
             loadingMessage.classList.remove('hidden');
             
             try {
@@ -394,54 +393,46 @@ async function loadPendingOrders() {
                 let orders = responseJson.data || responseJson;
                 if (!Array.isArray(orders)) orders = [];
                 
-                // 1. Normalização dos dados
                 currentOrders = orders.map(rawOrder => {
                     const o = rawOrder.json || rawOrder;
-                    return { ...o, maintenance_extras: typeof o.maintenance_extras === 'string' ? JSON.parse(o.maintenance_extras) : o.maintenance_extras };
+                    const extras = (typeof o.maintenance_extras === 'string' && o.maintenance_extras.startsWith('{')) ? JSON.parse(o.maintenance_extras) : (o.maintenance_extras || {});
+                    return { ...o, maintenance_extras: extras };
                 });
 
-                // 2. Lógica de Data (HOJE vs FUTURO)
-                const hoje = new Date();
-                hoje.setHours(0, 0, 0, 0);
-
-                const filaDoDia = [];
-                const filaFutura = [];
+                const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+                const filaDoDia = []; const filaFutura = [];
 
                 currentOrders.forEach(order => {
                     const dataOS = new Date(order.scheduled_date || order.created_at);
                     dataOS.setHours(0, 0, 0, 0);
-
-                    if (dataOS > hoje) {
-                        filaFutura.push(order);
-                    } else {
-                        filaDoDia.push(order);
-                    }
+                    if (dataOS > hoje) filaFutura.push(order); else filaDoDia.push(order);
                 });
 
                 loadingMessage.classList.add('hidden');
 
-                // 3. Renderizar Fila do Dia (Esquerda)
+                // Renderizar Fila do Dia (Esquerda)
                 if (filaDoDia.length === 0) {
                     filaContainer.innerHTML = '<p class="text-gray-400 text-center py-10 bg-white rounded-lg border border-dashed text-xs uppercase font-bold">Fila do dia vazia.</p>';
                     filaCountSpan.textContent = '0';
                     dispatchAllBtn.disabled = true;
+                    dispatchAllBtn.innerHTML = `Despachar Tudo para Análise (0)`;
                 } else {
                     filaCountSpan.textContent = filaDoDia.length;
                     dispatchAllBtn.disabled = false;
+                    dispatchAllBtn.innerHTML = `Despachar Tudo para Análise (${filaDoDia.length})`;
                     filaDoDia.forEach(o => filaContainer.insertAdjacentHTML('beforeend', renderOrderCard(o)));
                 }
 
-                // 4. Renderizar Programação Futura (Direita)
-                if (filaFutura.length === 0) {
-                    futuraContainer.innerHTML = '<p class="text-gray-400 text-center py-10 bg-white rounded-lg border border-dashed text-xs uppercase font-bold">Nenhuma programação futura.</p>';
-                } else {
+                // Renderizar Programação Futura (Direita)
+                if (filaFutura.length > 0) {
                     filaFutura.forEach(o => futuraContainer.insertAdjacentHTML('beforeend', renderOrderCard(o)));
+                } else if (futuraContainer) {
+                    futuraContainer.innerHTML = '<p class="text-gray-400 text-center py-10 bg-white rounded-lg border border-dashed text-xs uppercase font-bold">Nenhuma programação futura.</p>';
                 }
                 
                 addCardClickListeners();
-
             } catch (error) {
-                console.error("Erro ao carregar ordens:", error);
+                console.error("Erro ao carregar:", error);
                 loadingMessage.textContent = "Erro na conexão.";
             }
         }
@@ -465,11 +456,31 @@ async function showDetailsModal(order) {
             document.getElementById('detail-maintenance-extras').innerHTML = formatMaintenanceExtras(order.maintenance_extras);
             document.getElementById('detail-observation').textContent = order.observation || 'Nenhuma observação registrada.';
             
-            // Chamar a Linha do Tempo
             await carregarLinhaDoTempo(order.id);
-
             detailsModal.classList.remove('hidden');
             detailsModal.classList.add('flex');
+        }
+
+        async function carregarLinhaDoTempo(osId) {
+            const listParent = document.getElementById('details-modal').querySelector('.p-6.space-y-5');
+            const existingTimeline = document.getElementById('timeline-container');
+            if (existingTimeline) existingTimeline.remove();
+
+            try {
+                const { data: events, error } = await supabaseClient.from('history_events').select('*').eq('service_order_id', osId).order('timestamp', { ascending: true });
+                if (error) throw error;
+                let timelineHtml = `<div id="timeline-container" class="mt-4 space-y-4 border-l-2 border-slate-200 ml-2 pl-4">`;
+                if (events && events.length > 0) {
+                    events.forEach(ev => {
+                        const date = new Date(ev.timestamp);
+                        timelineHtml += `<div class="relative"><div class="absolute -left-[21px] top-1 w-3 h-3 bg-brand-blue rounded-full border-2 border-white"></div><p class="text-[11px] font-black text-slate-800 uppercase tracking-tighter">${ev.action}</p><p class="text-[10px] text-gray-500 font-medium">${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</p></div>`;
+                    });
+                } else {
+                    timelineHtml += `<p class="text-[10px] text-gray-400 italic uppercase">Iniciando histórico...</p>`;
+                }
+                timelineHtml += `</div>`;
+                listParent.insertAdjacentHTML('beforeend', timelineHtml);
+            } catch (err) { console.error(err); }
         }
 
         function showSuccessModal() {
@@ -638,38 +649,33 @@ async function showDetailsModal(order) {
                 await loadPendingOrders(); 
             });
 
-
-            // Listener do botão Despachar Tudo (Abre o modal de confirmação customizado)
+            // Listener do botão Despachar Tudo (FILTRADO APENAS PARA HOJE/PASSADO)
             dispatchAllBtn.addEventListener('click', () => {
-                if (currentOrders.length === 0) {
-                    alert("Nenhuma ordem para despachar.");
-                    return;
+                const hoje = new Date(); hoje.setHours(0,0,0,0);
+                const ordensDoDia = currentOrders.filter(o => {
+                    const dataOS = new Date(o.scheduled_date || o.created_at);
+                    dataOS.setHours(0,0,0,0);
+                    return dataOS <= hoje;
+                });
+
+                if (ordensDoDia.length === 0) {
+                    alert("Não há ordens de HOJE/ATRASADAS para despachar."); return;
                 }
-                const count = currentOrders.length;
-                confirmDispatchMessage.textContent = `Tem certeza que deseja despachar ${count} ${count > 1 ? 'ordens' : 'ordem'} para Análise Técnica?`;
-                confirmDispatchModal.classList.remove('hidden');
-                confirmDispatchModal.classList.add('flex');
+
+                const count = ordensDoDia.length;
+                confirmDispatchMessage.textContent = `Confirmar o despacho de ${count} ${count > 1 ? 'ordens' : 'ordem'} da Fila do Dia para Análise Técnica?`;
+                confirmDispatchBtn.dataset.idsParaDespacho = JSON.stringify(ordensDoDia.map(o => o.id));
+                confirmDispatchModal.classList.remove('hidden'); confirmDispatchModal.classList.add('flex');
             });
 
-            // Ação de Confirmação no Modal Customizado
+            // Ação de Confirmação no Modal (Envia apenas o que foi filtrado)
             confirmDispatchBtn.addEventListener('click', async () => {
                 closeConfirmDispatchModal();
-                // Filtra apenas as ordens que são para hoje ou passado para despachar
-                const hoje = new Date(); hoje.setHours(0,0,0,0);
-                const osIdsParaDespacho = currentOrders
-                    .filter(o => new Date(o.scheduled_date || o.created_at).setHours(0,0,0,0) <= hoje.getTime())
-                    .map(o => o.id);
-
-                if (osIdsParaDespacho.length > 0) {
-                    await dispatchAllOrders(osIdsParaDespacho);
-                } else {
-                    alert("Não há ordens de HOJE para despachar.");
-                }
+                const osIds = JSON.parse(confirmDispatchBtn.dataset.idsParaDespacho || "[]");
+                if (osIds.length > 0) await dispatchAllOrders(osIds);
             });
 
-            // Ação de Cancelamento no Modal Customizado
             cancelDispatchBtn.addEventListener('click', closeConfirmDispatchModal);
-
 
             // Listener para fechar o modal de detalhes
             closeDetailsBtn.addEventListener('click', closeDetailsModal);
