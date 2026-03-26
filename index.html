@@ -701,7 +701,15 @@ async function showDetailsModal(order) {
             });
 
             baseTrocaCheck.addEventListener('change', (event) => {
-                baseTrocaRadiosDiv.classList.toggle('hidden', !event.target.checked);
+                if (!event.target.checked) {
+                    // Se desmarcar o checkbox, limpa os rádio botões para não enviar dados "sujos"
+                    document.querySelectorAll('input[name="base_troca_status"]').forEach(radio => {
+                        radio.checked = false;
+                    });
+                    baseTrocaRadiosDiv.classList.add('hidden');
+                } else {
+                    baseTrocaRadiosDiv.classList.remove('hidden');
+                }
             });
 
             // Listener de Submissão do Formulário (POST)
