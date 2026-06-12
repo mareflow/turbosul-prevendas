@@ -47,18 +47,10 @@
         </div>
 
         <nav class="flex items-center space-x-6 text-sm text-gray-600">
-            <a href="#" class="px-3 py-1 hover:bg-slate-100 rounded transition duration-150 font-medium">Quadro de Produção</a>
-            <span class="text-xs text-gray-400">BR</span>
-            <a href="#" class="font-medium text-gray-800 mr-4">Português</a>
-
-            <div class="flex items-center space-x-2 text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 10a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 00-.707-.293h-1.414a1 1 0 100 2h1.414a1 1 0 00.707-.293zM3.465 5.636L4.172 6.343a1 1 0 001.414-1.414L4.879 4.222a1 1 0 00-1.414 1.414zm.707 7.778l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM10 15a1 1 0 100 2h1a1 1 0 100-2h-1z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-sm font-medium">Setor Pré-Vendas</span>
+            <div class="flex items-center space-x-2 text-gray-700 pr-4">
+                <span class="text-sm font-black text-slate-800 uppercase tracking-wider">Setor Pré-Vendas</span>
             </div>
-
-            <button id="logout-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-4 rounded-md transition duration-150">Sair</button>
+            <button id="logout-button" onclick="window.location.href='https://mareflow.github.io/turbosul-login/'" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-4 rounded-md transition duration-150">Sair</button>
         </nav>
     </header>
 
@@ -236,7 +228,7 @@
                 </div>
                 
                 <h4 class="text-base font-semibold text-gray-800 border-b pb-2 pt-4">Histórico de Eventos</h4>
-                <p class="text-gray-500 italic">Funcionalidade de histórico não implementada (Placeholder).</p>
+                <div id="timeline-container" class="mt-4 space-y-4 border-l-2 border-slate-200 ml-2 pl-4"></div>
             </div>
         </div>
     </div>
@@ -656,7 +648,7 @@ async function showDetailsModal(order) {
             // Listener de Logout
             document.getElementById('logout-button').addEventListener('click', async () => {
                 await supabaseClient.auth.signOut();
-                window.location.href = '/index.html';
+                window.location.href = 'https://mareflow.github.io/turbosul-login/';
             });
             
             // Listener do modal de sucesso de CRIAÇÃO
